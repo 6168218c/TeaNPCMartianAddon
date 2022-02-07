@@ -50,7 +50,7 @@ namespace TeaNPCMartianAddon.UI
             if (timer <= fadeTime) opacity = (float)timer / fadeTime;
             else if (timer >= maxTime-fadeTime && timer < maxTime) opacity = (float)(maxTime - timer) / fadeTime;
             else if (timer >= maxTime) opacity = 0;
-            GameShaders.Misc["TeaNPCAddon:FadeIn"].UseOpacity(opacity).UseColor(Color.Turquoise).Apply();
+            GameShaders.Misc["TeaNPCAddon:FadeIn"].UseImage1("Images/Misc/Perlin").UseOpacity(opacity).UseColor(Color.Turquoise).Apply();
             var font = Terraria.GameContent.FontAssets.DeathText.Value;
             var text = quote;
             Vector2 offset = font.MeasureString(text);

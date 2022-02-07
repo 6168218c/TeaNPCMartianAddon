@@ -188,7 +188,7 @@ namespace TeaNPCMartianAddon.Items.Bosses.Martians
                 NPC.NewNPC((int)player.Center.X, (int)player.Center.Y - 450, ModContent.NPCType<SkyDestroyerHead>(), 1, 0, -2);
             }
             Main.PlaySound(SoundID.Roar, player.position, 0);*/
-			SDMessage(Language.GetTextValue("Mods.TeaNPCAddon.NPCChat.SDEX0"));
+			SDMessage(Language.GetTextValue("Mods.TeaNPCMartianAddon.NPCChat.SDEX0"));
             return true;
         }
         public void SDMessage(string message)

@@ -12,6 +12,7 @@ float uDirection;
 float3 uLightSource;
 float2 uImageSize0;
 float2 uImageSize1;
+float4 uShaderSpecificData;
 
 // This is a shader. You are on your own with shaders. Compile shaders in an XNB project.
 

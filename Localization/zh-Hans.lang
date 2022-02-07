@@ -282,14 +282,14 @@ BuffName.AbyssCommandBuff =深渊指令
 BuffDescription.AbyssCommandBuff =深渊哨兵力量增强
 
 NPCName.SkySearcherHead =天际搜寻者
-NPCName.SkySearcherTail ={$Mods.TeaNPCAddon.NPCName.SkySearcherHead}
-NPCName.SkySearcherBodyAlt ={$Mods.TeaNPCAddon.NPCName.SkySearcherHead}
-NPCName.SkySearcherBody ={$Mods.TeaNPCAddon.NPCName.SkySearcherHead}
+NPCName.SkySearcherTail ={$Mods.TeaNPCMartianAddon.NPCName.SkySearcherHead}
+NPCName.SkySearcherBodyAlt ={$Mods.TeaNPCMartianAddon.NPCName.SkySearcherHead}
+NPCName.SkySearcherBody ={$Mods.TeaNPCMartianAddon.NPCName.SkySearcherHead}
 NPCName.SkyProbe =天际探测器
 NPCName.SkyDestroyerHead =天际毁灭者EX
-NPCName.SkyDestroyerTail ={$Mods.TeaNPCAddon.NPCName.SkyDestroyerHead}
-NPCName.SkyDestroyerBodyAlt ={$Mods.TeaNPCAddon.NPCName.SkyDestroyerHead}
-NPCName.SkyDestroyerBody ={$Mods.TeaNPCAddon.NPCName.SkyDestroyerHead}
+NPCName.SkyDestroyerTail ={$Mods.TeaNPCMartianAddon.NPCName.SkyDestroyerHead}
+NPCName.SkyDestroyerBodyAlt ={$Mods.TeaNPCMartianAddon.NPCName.SkyDestroyerHead}
+NPCName.SkyDestroyerBody ={$Mods.TeaNPCMartianAddon.NPCName.SkyDestroyerHead}
 NPCName.SkyChaser =天际追击者
 
 TileObject.EvilAnvil =恶魔/猩红砧

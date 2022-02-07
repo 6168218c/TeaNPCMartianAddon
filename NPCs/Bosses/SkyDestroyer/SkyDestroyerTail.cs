@@ -60,10 +60,6 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 }
             }
         }
-        public override bool CanHitPlayer(Player target, ref int cooldownSlot)
-        {
-            return CanHitPlayer(target, ref cooldownSlot);
-        }
         public override bool CheckActive()
         {
             return false;

@@ -398,10 +398,6 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             NPC.localAI[0] = reader.ReadSingle();
             base.ReceiveExtraAI(reader);
         }
-        public override bool CanHitPlayer(Player target, ref int cooldownSlot)
-        {
-            return base.CanHitPlayer(target, ref cooldownSlot);
-        }
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
         {
             return new bool?(false);

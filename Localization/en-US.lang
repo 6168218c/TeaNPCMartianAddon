@@ -313,14 +313,14 @@ BuffName.AbyssCommandBuff =Direct Command
 BuffDescription.AbyssCommandBuff =The abyssal sentries are empowered
 
 NPCName.SkySearcherHead =Sky Searcher
-NPCName.SkySearcherTail ={$Mods.TeaNPCAddon.NPCName.SkySearcherHead}
-NPCName.SkySearcherBodyAlt ={$Mods.TeaNPCAddon.NPCName.SkySearcherHead}
-NPCName.SkySearcherBody ={$Mods.TeaNPCAddon.NPCName.SkySearcherHead}
+NPCName.SkySearcherTail ={$Mods.TeaNPCMartianAddon.NPCName.SkySearcherHead}
+NPCName.SkySearcherBodyAlt ={$Mods.TeaNPCMartianAddon.NPCName.SkySearcherHead}
+NPCName.SkySearcherBody ={$Mods.TeaNPCMartianAddon.NPCName.SkySearcherHead}
 NPCName.SkyProbe =Sky Probe
 NPCName.SkyDestroyerHead =The Sky Colossus
-NPCName.SkyDestroyerTail ={$Mods.TeaNPCAddon.NPCName.SkyDestroyerHead}
-NPCName.SkyDestroyerBodyAlt ={$Mods.TeaNPCAddon.NPCName.SkyDestroyerHead}
-NPCName.SkyDestroyerBody ={$Mods.TeaNPCAddon.NPCName.SkyDestroyerHead}
+NPCName.SkyDestroyerTail ={$Mods.TeaNPCMartianAddon.NPCName.SkyDestroyerHead}
+NPCName.SkyDestroyerBodyAlt ={$Mods.TeaNPCMartianAddon.NPCName.SkyDestroyerHead}
+NPCName.SkyDestroyerBody ={$Mods.TeaNPCMartianAddon.NPCName.SkyDestroyerHead}
 NPCName.SkyChaser =Sky Chaser
 NPCName.MartianDiplomat =Martian Diplomat
 

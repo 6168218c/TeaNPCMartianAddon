@@ -26,7 +26,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 			spriteBatch.End();
 			spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
 		}
-		internal static void Draw(this Projectile projectile, SpriteBatch spriteBatch, Vector2 position, Color color,float rotation,float scale)
+		internal static void Draw(this Projectile projectile, SpriteBatch spriteBatch, Vector2 position, Color color,float opacity,float rotation,float scale)
         {
 			if (!hasBegun) throw new InvalidOperationException($"{nameof(WarpMarkDrawer.BeginDraw)} has not been called");
 			Texture2D texture2D13 = Terraria.GameContent.TextureAssets.Projectile[projectile.type].Value;
@@ -35,7 +35,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 			Rectangle rectangle = new Rectangle(0, y3, texture2D13.Width, num156);
 			Vector2 origin2 = rectangle.Size() / 2f;
 
-			TeaNPCMartianAddon.PortalEffect.Parameters["opacity"].SetValue(projectile.Opacity);
+			TeaNPCMartianAddon.PortalEffect.Parameters["opacity"].SetValue(opacity);
 			Main.graphics.GraphicsDevice.Textures[0] = texture2D13;
 			Main.graphics.GraphicsDevice.Textures[1] = TeaNPCMartianAddon.Instance.RequestTexture("Images/Stars");
 			Main.graphics.GraphicsDevice.Textures[2] = TeaNPCMartianAddon.Instance.RequestTexture("Images/Extra_49");
@@ -201,8 +201,8 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 			Main.spriteBatch.Draw(texture2D13, End - Main.screenPosition + new Vector2(0f, projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Color.Black * projectile.Opacity, -projectile.rotation, origin2, projectile.scale * 1.25f, SpriteEffects.FlipHorizontally, 0f);
 			Main.spriteBatch.Draw(texture2D13, End - Main.screenPosition + new Vector2(0f, projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), projectile.GetAlpha(Color.White), projectile.rotation, origin2, projectile.scale, SpriteEffects.None, 0f);*/
 			WarpMarkDrawer.BeginDraw(spriteBatch, BlendState.Additive);
-			Projectile.Draw(spriteBatch,Start, Projectile.GetAlpha(Color.Turquoise), Projectile.rotation,Projectile.scale);
-			Projectile.Draw(spriteBatch,End, Projectile.GetAlpha(Color.Turquoise), Projectile.rotation, Projectile.scale);
+			Projectile.Draw(spriteBatch,Start, Projectile.GetAlpha(Color.Turquoise),Projectile.Opacity, Projectile.rotation,Projectile.scale);
+			Projectile.Draw(spriteBatch,End, Projectile.GetAlpha(Color.Turquoise), Projectile.Opacity, Projectile.rotation, Projectile.scale);
 			WarpMarkDrawer.EndDraw(spriteBatch);
 
 			WarpMarkDrawer.BeginDraw(spriteBatch, BlendState.AlphaBlend);
@@ -245,8 +245,8 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 			Main.spriteBatch.Draw(texture2D13, End - Main.screenPosition + new Vector2(0f, projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Color.Black * projectile.Opacity, -projectile.rotation, origin2, projectile.scale * 1.25f, SpriteEffects.FlipHorizontally, 0f);
 			Main.spriteBatch.Draw(texture2D13, End - Main.screenPosition + new Vector2(0f, projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), projectile.GetAlpha(Color.White), projectile.rotation, origin2, projectile.scale, SpriteEffects.None, 0f);*/
 			WarpMarkDrawer.BeginDraw(spriteBatch, BlendState.Additive);
-			Projectile.Draw(spriteBatch, position, Projectile.GetAlpha(Color.Lerp(Main.ColorOfTheSkies, Color.Turquoise, 0.1f)), Projectile.rotation, Projectile.scale);
-			Projectile.Draw(spriteBatch, End, Projectile.GetAlpha(Color.Turquoise), Projectile.rotation, Projectile.scale);
+			Projectile.Draw(spriteBatch, position, Projectile.GetAlpha(Color.Lerp(Main.ColorOfTheSkies, Color.Turquoise, 0.1f)), Projectile.Opacity, Projectile.rotation, Projectile.scale);
+			Projectile.Draw(spriteBatch, End, Projectile.GetAlpha(Color.Turquoise), Projectile.Opacity, Projectile.rotation, Projectile.scale);
 			WarpMarkDrawer.EndDraw(spriteBatch);
 
 			WarpMarkDrawer.BeginDraw(spriteBatch, BlendState.AlphaBlend);
@@ -521,8 +521,8 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 				WarpMarkDrawer.EndDraw(spriteBatch);
 			}
 			WarpMarkDrawer.BeginDraw(spriteBatch, BlendState.Additive);
-			Projectile.Draw(spriteBatch, Start, GetAlpha(Color.Turquoise, 0), rotation[0], scale[0]);
-			Projectile.Draw(spriteBatch, End, GetAlpha(Color.Turquoise, 1), rotation[1], scale[1]);
+			Projectile.Draw(spriteBatch, Start, GetAlpha(Color.Turquoise, 0),GetOpacity(0), rotation[0], scale[0]);
+			Projectile.Draw(spriteBatch, End, GetAlpha(Color.Turquoise, 1),GetOpacity(1), rotation[1], scale[1]);
 			WarpMarkDrawer.EndDraw(spriteBatch);
 
 			//projectile.DrawAim(spriteBatch, projectile.velocity, Color.Yellow);

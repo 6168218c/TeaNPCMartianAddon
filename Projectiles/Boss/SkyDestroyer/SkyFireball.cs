@@ -229,7 +229,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                     Projectile.DrawAim(Main.spriteBatch, Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * 4800f, alpha);
                 }
             }
-            return PreDraw(ref lightColor);
+            return false;
         }
     }
     public class SkyFireballLauncher : ModProjectile//weird inheriting

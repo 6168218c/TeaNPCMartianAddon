@@ -88,9 +88,9 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         }
         public ModulePhase[] Modules { get; private set; } = new ModulePhase[3]
         {
-            new ModulePhase(1,LightningStorm,Plasmerizer,1,"Mods.TeaNPCAddon.NPCChat.SDEX1"),
-            new ModulePhase(2,new int[]{ WarpMove,Plasmerizer,PlasmaWarpBlast,FireballBarrage,LightningStorm },0.85f,"Mods.TeaNPCAddon.NPCChat.SDEX2"),
-            new ModulePhase(3,new int[]{ SpaceWarp,PlasmaWarpBlast,WarpMove,Plasmerizer,LightningStormEx,PlasmaWarpBlast },0.45f,"Mods.TeaNPCAddon.NPCChat.SDEX3")
+            new ModulePhase(1,LightningStorm,Plasmerizer,1,"Mods.TeaNPCMartianAddon.NPCChat.SDEX1"),
+            new ModulePhase(2,new int[]{ WarpMove,Plasmerizer,PlasmaWarpBlast,FireballBarrage,LightningStorm },0.85f,"Mods.TeaNPCMartianAddon.NPCChat.SDEX2"),
+            new ModulePhase(3,new int[]{ SpaceWarp,PlasmaWarpBlast,WarpMove,Plasmerizer,LightningStormEx,PlasmaWarpBlast },0.45f,"Mods.TeaNPCMartianAddon.NPCChat.SDEX3")
         };
         private int _currModuleIndex = -1;
         internal ModulePhase CurrentModule => Modules[_currModuleIndex];
@@ -1500,10 +1500,6 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         }
 
         public bool phase3 = false;
-        public override bool CanHitPlayer(Player target, ref int cooldownSlot)
-        {
-            return base.CanHitPlayer(target, ref cooldownSlot);
-        }
         public override void OnHitPlayer(Player player, int damage, bool crit)
         {
             player.AddBuff(BuffID.Electrified, 720, true);

@@ -17,68 +17,67 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 {
     public class SkyUFO:ModProjectile
     {
-        Projectile projectile;
         float playerX;
         List<Node> nodeList = new List<Node>();
         public override string Texture => MigrationUtils.ProjTexturePrefix + ProjectileID.UFOMinion;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Sky UFO");
-            Main.projFrames[projectile.type] = 4;
+            Main.projFrames[Projectile.type] = 4;
         }
         public override void SetDefaults()
         {
-            Projectile.width = 46;
-            Projectile.height = 46;
-            Projectile.hostile = true;
-            Projectile.alpha = 255;
-            Projectile.ignoreWater = true;
-            Projectile.tileCollide = false;
-            projectile.aiStyle = -1;
-            projectile.scale = 2.5f;
+            base.Projectile.width = 46;
+            base.Projectile.height = 46;
+            base.Projectile.hostile = true;
+            base.Projectile.alpha = 255;
+            base.Projectile.ignoreWater = true;
+            base.Projectile.tileCollide = false;
+            Projectile.aiStyle = -1;
+            Projectile.scale = 2.5f;
         }
         public override void AI()
         {
-            if (projectile.localAI[1] == 1)
+            if (Projectile.localAI[1] == 1)
             {
-                projectile.HoverMovementEx(projectile.Center - Vector2.UnitY * 150, 60f, 1f);
-                int i = Player.FindClosest(projectile.position, projectile.width, projectile.height);
+                Projectile.HoverMovementEx(Projectile.Center - Vector2.UnitY * 150, 60f, 1f);
+                int i = Player.FindClosest(Projectile.position, Projectile.width, Projectile.height);
                 if (i != -1)
                 {
-                    if (projectile.DistanceSQ(Main.player[i].Center) < 1000 * 1000)
+                    if (Projectile.DistanceSQ(Main.player[i].Center) < 1000 * 1000)
                     {
                         return;
                     }
                 }
-                projectile.Kill();
+                Projectile.Kill();
                 return;
             }
-            projectile.Loomup();
+            Projectile.Loomup();
             int index = NPC.FindFirstNPC(ModContent.NPCType<SkyDestroyerHead>());
             if (index == -1)
             {
-                projectile.localAI[1] = 1;
+                Projectile.localAI[1] = 1;
                 return;
             }
             NPC head = Main.npc[index];
             if (head.ai[1] != SkyDestroyerSegment.WarpMove)
             {
-                projectile.localAI[1] = 1;
+                Projectile.localAI[1] = 1;
                 return;
             }
             Player player = Main.player[head.target];
 
-            if (projectile.ai[1] == 0)
+            if (Projectile.ai[1] == 0)
             {
-                projectile.localAI[0]++;
-                if (projectile.localAI[0] <= 120)
+                Projectile.localAI[0]++;
+                if (Projectile.localAI[0] <= 120)
                 {
                     playerX = player.Center.X;
                 }
-                Vector2 target = new Vector2(playerX,player.Center.Y) - Vector2.UnitY * 450 + Vector2.UnitX * projectile.ai[0] * 180;
-                projectile.HoverMovement(target, 24f, 0.45f);
+                Vector2 target = new Vector2(playerX,player.Center.Y) - Vector2.UnitY * 450 + Vector2.UnitX * Projectile.ai[0] * 180;
+                Projectile.HoverMovement(target, 24f, 0.45f);
 
-                if (projectile.localAI[0] % 5 == 0)
+                if (Projectile.localAI[0] % 5 == 0)
                 {
                     nodeList.Clear();
                     Vector2 unit;
@@ -96,13 +95,13 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                 }
             }
 
-            projectile.rotation = projectile.velocity.X * 0.05f;
-            projectile.frameCounter++;
+            Projectile.rotation = Projectile.velocity.X * 0.05f;
+            Projectile.frameCounter++;
             int num31 = 3;
-            if (projectile.frameCounter >= 4 * num31)
-                projectile.frameCounter = 0;
+            if (Projectile.frameCounter >= 4 * num31)
+                Projectile.frameCounter = 0;
 
-            projectile.frame = projectile.frameCounter / num31;
+            Projectile.frame = Projectile.frameCounter / num31;
         }
         public override bool PreDraw(ref Color lightColor)
         {
@@ -135,8 +134,8 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                 vertecies.Add(new VertexStripInfo((projectile.oldPos[i] - d * i * 0.35f) + dir * -width, Color.White, new Vector3((float)Math.Sqrt(factor), 0, alpha)));*/
                 var widthUnit = nodeList[i].rotation.ToRotationVector2().RotatedBy(Math.PI / 2);
                 float factor = i / (float)nodeList.Count;
-                vertecies.Add(new VertexStripInfo(projectile.Center + nodeList[i].Center + widthUnit * nodeList[i].width / 2, Color.Turquoise, new Vector3((float)Math.Sqrt(factor), 1, 1)));
-                vertecies.Add(new VertexStripInfo(projectile.Center + nodeList[i].Center - widthUnit * nodeList[i].width / 2, Color.Turquoise, new Vector3((float)Math.Sqrt(factor), 0, 1)));
+                vertecies.Add(new VertexStripInfo(Projectile.Center + nodeList[i].Center + widthUnit * nodeList[i].width / 2, Color.Turquoise, new Vector3((float)Math.Sqrt(factor), 1, 1)));
+                vertecies.Add(new VertexStripInfo(Projectile.Center + nodeList[i].Center - widthUnit * nodeList[i].width / 2, Color.Turquoise, new Vector3((float)Math.Sqrt(factor), 0, 1)));
             }
             //vertecies.Add(new VertexStripInfo(projectile.Center + Vector2.UnitX * 100, Color.Turquoise, new Vector3((float)Math.Sqrt(0), 1, 1)));
             //vertecies.Add(new VertexStripInfo(projectile.Center - Vector2.UnitX * 100, Color.Turquoise, new Vector3((float)Math.Sqrt(0.04f), 0, 1)));
@@ -148,9 +147,9 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
             var projection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, 0, 1);
             var model = Matrix.CreateTranslation(new Vector3(-Main.screenPosition.X, -Main.screenPosition.Y, 0)) * Main.GameViewMatrix.TransformationMatrix;
 
-            TeaNPCMartianAddon.Trail.Parameters["alpha"].SetValue(projectile.Opacity);
+            TeaNPCMartianAddon.Trail.Parameters["alpha"].SetValue(Projectile.Opacity);
             TeaNPCMartianAddon.Trail.Parameters["uTransform"].SetValue(model * projection);
-            TeaNPCMartianAddon.Trail.Parameters["uTime"].SetValue(projectile.timeLeft * 0.04f);
+            TeaNPCMartianAddon.Trail.Parameters["uTime"].SetValue(Projectile.timeLeft * 0.04f);
 
             Main.graphics.GraphicsDevice.Textures[0] = Mod.RequestTexture("Images/Extra_179");
 
@@ -165,12 +164,12 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
-            Texture2D texture2D13 = Terraria.GameContent.TextureAssets.Projectile[projectile.type].Value;
-            int num156 = Terraria.GameContent.TextureAssets.Projectile[projectile.type].Value.Height / Main.projFrames[projectile.type]; //ypos of lower right corner of sprite to draw
-            int y3 = num156 * projectile.frame; //ypos of upper left corner of sprite to draw
+            Texture2D texture2D13 = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
+            int num156 = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value.Height / Main.projFrames[Projectile.type]; //ypos of lower right corner of sprite to draw
+            int y3 = num156 * Projectile.frame; //ypos of upper left corner of sprite to draw
             Rectangle rectangle = new Rectangle(0, y3, texture2D13.Width, num156);
             Vector2 origin2 = rectangle.Size() / 2f;
-            Main.spriteBatch.Draw(texture2D13, projectile.Center - Main.screenPosition + new Vector2(0f, projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), projectile.GetAlpha(lightColor), projectile.rotation, origin2, projectile.scale, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(texture2D13, Projectile.Center - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Projectile.GetAlpha(lightColor), Projectile.rotation, origin2, Projectile.scale, SpriteEffects.None, 0f);
             return false;
         }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
@@ -180,7 +179,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                 return true;
             }
             float num6 = 0f;
-            if (Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), projectile.Center, projectile.Center + Vector2.UnitY*1800, projectile.width * projectile.scale, ref num6))
+            if (Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center, Projectile.Center + Vector2.UnitY*1800, Projectile.width * Projectile.scale, ref num6))
             {
                 return true;
             }

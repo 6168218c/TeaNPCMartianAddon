@@ -130,10 +130,6 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             }
             //if (npc.Center.HasNaNs() || float.IsInfinity(npc.Center.X) || float.IsInfinity(npc.Center.Y)) System.Diagnostics.Debugger.Break();
         }
-        public override bool CanHitPlayer(Player target, ref int cooldownSlot)
-        {
-            return CanHitPlayer(target, ref cooldownSlot);
-        }
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
         {
             return new bool?(false);

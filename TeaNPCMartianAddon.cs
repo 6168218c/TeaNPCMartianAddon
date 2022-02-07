@@ -7,6 +7,7 @@ using Terraria.Graphics.Shaders;
 using Terraria.UI;
 using TeaNPCMartianAddon.UI;
 using TeaNPCMartianAddon.Effects;
+using ReLogic.Content;
 
 namespace TeaNPCMartianAddon
 {
@@ -23,22 +24,22 @@ namespace TeaNPCMartianAddon
             base.Load();
             if (!Main.dedServ)
             {
-                Trail = Assets.Request<Effect>("Effects/Trail").Value;
-                FadeIn = Assets.Request<Effect>("Effects/FadeIn").Value;
-                PortalEffect = Assets.Request<Effect>(("Effects/PortalEffect")).Value;
+                Trail = Assets.Request<Effect>("Effects/Trail", AssetRequestMode.ImmediateLoad).Value;
+                FadeIn = Assets.Request<Effect>("Effects/FadeIn", AssetRequestMode.ImmediateLoad).Value;
+                PortalEffect = Assets.Request<Effect>("Effects/PortalEffect", AssetRequestMode.ImmediateLoad).Value;
 
                 TitleUILayer = new UserInterface();
                 TitleUI = new TitleUI();
                 TitleUILayer.SetState(TitleUI);
                 TitleUI.Activate();
 
-                GameShaders.Misc["TeaNPCAddon:FadeIn"] = new MiscShaderData(new Ref<Effect>(FadeIn), "FadeIn").UseImage0("Images/Misc/Perlin");
+                GameShaders.Misc["TeaNPCAddon:FadeIn"] = new MiscShaderData(new Ref<Effect>(FadeIn), "FadeIn").UseImage1("Images/Misc/Perlin");
 
-                Ref<Effect> circularRef = new Ref<Effect>(Assets.Request<Effect>("Effects/CircularDistort").Value);
+                Ref<Effect> circularRef = new Ref<Effect>(Assets.Request<Effect>("Effects/CircularDistort", AssetRequestMode.ImmediateLoad).Value);
                 Filters.Scene["TeaNPCAddon:CircularDistort"] = new Filter(new ScreenShaderData(circularRef, "CircularDistort"), EffectPriority.VeryHigh);
                 Filters.Scene["TeaNPCAddon:CircularDistort"].Load();
 
-                Ref<Effect> blackoutRef = new Ref<Effect>(Assets.Request<Effect>("Effects/Blackout").Value);
+                Ref<Effect> blackoutRef = new Ref<Effect>(Assets.Request<Effect>("Effects/Blackout", AssetRequestMode.ImmediateLoad).Value);
                 Filters.Scene["TeaNPCAddon:RectBlackout"] = new Filter(new FadeScreenShader(blackoutRef, "RectBlackout"), EffectPriority.VeryHigh);
                 Filters.Scene["TeaNPCAddon:RectBlackout"].Load();
                 Filters.Scene["TeaNPCAddon:CircularBlackout"] = new Filter(new FadeScreenShader(blackoutRef, "CircularBlackout"), EffectPriority.VeryHigh);
