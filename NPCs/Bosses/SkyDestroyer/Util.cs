@@ -144,28 +144,70 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             }
         }
         public static void WormMovementEx(this Entity entity, Vector2 dest, float maxSpeed, float turnAccle = 0.1f, float ramAccle = 0.15f,
-            float radiusSpeed = 0.05f, int distLimit = 900, float angleLimit = MathHelper.Pi * 2 / 5)
+            float radiusSpeed = 0.05f, int distLimit = 900, float angleLimit = MathHelper.Pi * 2 / 5, bool dynamicRadius = true)
         {
             Vector2 targetVector = dest - entity.Center;
             targetVector = targetVector.SafeNormalize(Vector2.UnitY) * maxSpeed;
             if (targetVector.HasNaNs()) System.Diagnostics.Debugger.Break();
-            if ((targetVector.X * entity.velocity.X > 0f) && (targetVector.Y * entity.velocity.Y > 0f)) //acclerate
-            {
-                entity.velocity.X += Math.Sign(targetVector.X - entity.velocity.X) * ramAccle;
-                entity.velocity.Y += Math.Sign(targetVector.Y - entity.velocity.Y) * ramAccle;
-            }
             float angle = MathHelper.WrapAngle(targetVector.ToRotation() - entity.velocity.ToRotation());
-            if (Math.Abs(angle) >= angleLimit && (dest - entity.Center).Compare(distLimit) >= 0)
+            if (Math.Abs(angle) >= angleLimit)
             {
+                Vector2 resultVelocity;
                 var speed = entity.velocity.Length();
-                entity.velocity = entity.velocity.RotatedBy(radiusSpeed * Math.Sign(angle));
+                float distance = Vector2.Distance(dest, entity.Center);
+                if (dynamicRadius && distance != 0 && maxSpeed / distance > radiusSpeed)
+                    radiusSpeed = speed / distance * (1 + (distance - distLimit) / distLimit * 0.2f);
+                resultVelocity = entity.velocity.RotatedBy(radiusSpeed * Math.Sign(angle));
                 if (speed < maxSpeed * 0.8f)
                 {
-                    entity.velocity = entity.velocity.SafeNormalize(Vector2.UnitY) * (speed + ramAccle);
+                    resultVelocity = resultVelocity.SafeNormalize(Vector2.UnitY) * (speed + ramAccle);
                 }
+                Vector2 resultVelocity2 = entity.velocity;
+                if ((targetVector.X * resultVelocity2.X > 0f) && (targetVector.Y * resultVelocity2.Y > 0f)) //acclerate
+                {
+                    resultVelocity2.X += Math.Sign(targetVector.X - resultVelocity2.X) * ramAccle;
+                    resultVelocity2.Y += Math.Sign(targetVector.Y - resultVelocity2.Y) * ramAccle;
+                }
+                if ((targetVector.X * resultVelocity2.X > 0f) || (targetVector.Y * resultVelocity2.Y > 0f)) //turn
+                {
+                    resultVelocity2.X += Math.Sign(targetVector.X - resultVelocity2.X) * turnAccle;
+                    resultVelocity2.Y += Math.Sign(targetVector.Y - resultVelocity2.Y) * turnAccle;
+
+                    if (Math.Abs(targetVector.Y) < maxSpeed * 0.2 && targetVector.X * resultVelocity2.X < 0)
+                    {
+                        resultVelocity2.Y += Math.Sign(resultVelocity2.Y) * turnAccle * 2f;
+                    }
+
+                    if (Math.Abs(targetVector.X) < maxSpeed * 0.2 && targetVector.Y * resultVelocity2.Y < 0)
+                    {
+                        resultVelocity2.X += Math.Sign(resultVelocity2.X) * turnAccle * 2f;
+                    }
+                }
+                else if (Math.Abs(targetVector.X) > Math.Abs(targetVector.Y))
+                {
+                    resultVelocity2.X += Math.Sign(targetVector.X - resultVelocity2.X) * turnAccle * 1.1f;
+                    if (Math.Abs(resultVelocity2.X) + Math.Abs(resultVelocity2.Y) < maxSpeed * 0.5)
+                    {
+                        resultVelocity2.Y += Math.Sign(resultVelocity2.Y) * turnAccle;
+                    }
+                }
+                else
+                {
+                    resultVelocity2.Y += Math.Sign(targetVector.Y - resultVelocity2.Y) * turnAccle * 1.1f;
+                    if (Math.Abs(resultVelocity2.X) + Math.Abs(resultVelocity2.Y) < maxSpeed * 0.5)
+                    {
+                        resultVelocity2.X += Math.Sign(resultVelocity2.X) * turnAccle;
+                    }
+                }
+                entity.velocity = LerpClamped(resultVelocity2, resultVelocity, 0.5f + (distance - distLimit) / (distLimit * 0.25f));
             }
             else
             {
+                if ((targetVector.X * entity.velocity.X > 0f) && (targetVector.Y * entity.velocity.Y > 0f)) //acclerate
+                {
+                    entity.velocity.X += Math.Sign(targetVector.X - entity.velocity.X) * ramAccle;
+                    entity.velocity.Y += Math.Sign(targetVector.Y - entity.velocity.Y) * ramAccle;
+                }
                 if ((targetVector.X * entity.velocity.X > 0f) || (targetVector.Y * entity.velocity.Y > 0f)) //turn
                 {
                     entity.velocity.X += Math.Sign(targetVector.X - entity.velocity.X) * turnAccle;
@@ -311,6 +353,12 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             if (vecLen > length * length) return 1;
             else if (vecLen == length * length) return 0;
             else return -1;
+        }
+        public static Vector2 LerpClamped(Vector2 value1, Vector2 value2, float amount)
+        {
+            if (amount <= 0) return value1;
+            else if (amount >= 1) return value2;
+            else return Vector2.Lerp(value1, value2, amount);
         }
         public static float GetLerpValue(float from, float to, float t, bool clamped = false)
         {

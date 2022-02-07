@@ -35,13 +35,17 @@ namespace TeaNPCMartianAddon.Items.Bosses.Martians
         public override bool? UseItem(Player player)
         {
             NPC.SpawnOnPlayer(player.whoAmI, ModContent.NPCType<SkyDestroyerHead>());
-            Terraria.Audio.SoundEngine.PlaySound(SoundID.Roar, player.position, 0);
+            //Terraria.Audio.SoundEngine.PlaySound(SoundID.Roar, player.position, 0);
             //SDMessage(Localization.Lang.BossSummon("SDSummon"));
+            SDMessage(Language.GetTextValue("Mods.TeaNPCAddon.NPCChat.SDEX0"));
             return true;
         }
         public void SDMessage(string message)
         {
-            Main.NewText(message, 119, 213, 255);
+            if (Main.netMode == NetmodeID.SinglePlayer)
+                Main.NewText(message, 119, 213, 255);
+            if (Main.netMode == NetmodeID.Server)
+                Terraria.Chat.ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(message), new Microsoft.Xna.Framework.Color(119, 213, 255));
         }
         public override void AddRecipes()
         {

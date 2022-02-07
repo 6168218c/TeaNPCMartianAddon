@@ -18,7 +18,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 {
     public class SkyMatterMissile : ModProjectile
     {
-        public override string Texture => "Terraria/Projectile_" + ProjectileID.SaucerMissile;
+        public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.SaucerMissile;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Matter Missile");
@@ -146,7 +146,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
     public class SkyAntimatterBombCenter : ModProjectile
     {
         int globalTimer = 0;
-        public override string Texture => "Terraria/Projectile_" + ProjectileID.ShadowBeamHostile;
+        public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.ShadowBeamHostile;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Antimatter Target");

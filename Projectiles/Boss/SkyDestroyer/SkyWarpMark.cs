@@ -14,7 +14,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 		bool firstMark;
 		bool despawning = false;
 		float[] extraAI = new float[2];
-        public override string Texture => "Terraria/Projectile_" + ProjectileID.VortexVortexPortal;
+        public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.VortexVortexPortal;
 		public Vector2 Start => Projectile.Center;
 		public Vector2 End => Projectile.ProjAIToVector();
         public override void SetDefaults()

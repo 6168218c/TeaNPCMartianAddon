@@ -22,7 +22,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
     public class SkyPlasmerizerRay:ModProjectile
     {
         public static int DefaultVelocityFactor => 120;
-        public override string Texture => "Terraria/Projectile_" + ProjectileID.ShadowBeamHostile;
+        public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.ShadowBeamHostile;
         List<Node> nodeList = new List<Node>();
         public override void SetStaticDefaults()
         {

@@ -16,7 +16,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
     public class SkyLightningOrbCenter : ModProjectile
     {
         public static int RotateDistance => 450;
-        public override string Texture => "Terraria/Projectile_" + ProjectileID.ShadowBeamHostile;
+        public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.ShadowBeamHostile;
         public override void SetDefaults()
         {
             Projectile.aiStyle = -1;
@@ -81,7 +81,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
     }
     public class SkyLightningOrb:ModProjectile
     {
-        public override string Texture => "Terraria/Projectile_"+ProjectileID.CultistBossLightningOrb;
+        public override string Texture => "Terraria/Images/Projectile_"+ProjectileID.CultistBossLightningOrb;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Lightning Orb");

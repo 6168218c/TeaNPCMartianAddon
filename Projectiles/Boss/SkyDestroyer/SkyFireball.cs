@@ -241,7 +241,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
             DisplayName.AddTranslation(GameCulture.FromCultureName(GameCulture.CultureName.Chinese), "火球");
             Main.projFrames[base.Projectile.type] = 4;
         }
-        public override string Texture => "Terraria/Projectile_" + ProjectileID.CultistBossFireBall;
+        public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.CultistBossFireBall;
         public override void SetDefaults()
         {
             base.Projectile.width = 46;
@@ -412,7 +412,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
     }
     public class SkyFireThrower : ModProjectile
 	{
-        public override string Texture => "Terraria/Projectile_" + ProjectileID.ShadowBeamHostile;
+        public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.ShadowBeamHostile;
         public static int RayWidth => 25;
 		public override void SetStaticDefaults()
 		{

@@ -16,7 +16,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 {
     public class SkyPlasmaArena:ModProjectile
     {
-        public override string Texture => "Terraria/Projectile_" + ProjectileID.ShadowBeamHostile;
+        public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.ShadowBeamHostile;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Plasma Arena");

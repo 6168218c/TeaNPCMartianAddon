@@ -20,7 +20,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             NPC.width = 150;
             NPC.height = 150;
             NPC.defense = 40;
-            this.Music = Mod.GetSoundSlot(SoundType.Music, "Sounds/Music/CosmicSpace");
+            this.Music = Mod.GetSoundSlot(SoundType.Music, "Sounds/Music/BuryTheLight0");
             NPC.lifeMax = 650000;
             NPC.aiStyle = -1;
             this.AnimationType = 10;
@@ -74,9 +74,9 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             Texture2D texture2D = Terraria.GameContent.TextureAssets.Npc[NPC.type].Value;
             texture = Terraria.GameContent.TextureAssets.Npc[NPC.type].Value;
             texture2D = Mod.Assets.Request<Texture2D>("Glow/NPCs/SkyDestroyerTailGlow").Value;
-            Color glowColor = Color.White;
-            SpriteEffects effects = (NPC.direction < 0) ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-            var mainColor = drawColor;
+            Color glowColor = NPC.GetAlpha(Color.White);
+            SpriteEffects effects = (base.NPC.direction < 0) ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+            var mainColor = NPC.GetAlpha(drawColor);
             spriteBatch.Draw(texture, NPC.Center - screenPos + new Vector2(0f, NPC.gfxOffY), new Rectangle?(NPC.frame), mainColor * NPC.Opacity, NPC.rotation + MathHelper.Pi / 2, NPC.frame.Size() / 2f, NPC.scale, effects, 0f);
             spriteBatch.Draw(texture2D, NPC.Center - screenPos + new Vector2(0f, NPC.gfxOffY), new Rectangle?(NPC.frame), glowColor * 0.75f * NPC.Opacity, NPC.rotation + MathHelper.Pi / 2, NPC.frame.Size() / 2f, NPC.scale, effects, 0f);
             return false;

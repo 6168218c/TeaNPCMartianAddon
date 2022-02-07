@@ -22,7 +22,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             NPC.width = 150;
             NPC.height = 150;
             NPC.defense = 100;
-            this.Music = Mod.GetSoundSlot(SoundType.Music, "Sounds/Music/CosmicSpace");
+            this.Music = Mod.GetSoundSlot(SoundType.Music, "Sounds/Music/BuryTheLight0");
             NPC.lifeMax = 650000;
             NPC.aiStyle = -1;
             this.AnimationType = 10;
@@ -39,6 +39,8 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             {
                 NPC.buffImmune[i] = true;
             }
+
+            NPC.hide = true;
         }
         public override void AI()
         {
@@ -75,27 +77,21 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             Player player = Main.player[NPC.target];
             NPC previousSegment = Main.npc[(int)NPC.ai[1]];
             NPC head = Main.npc[NPC.realLife];
-            if (head.ai[1] == SpaceWarp || head.ai[1] == WarpMove || head.ai[1] == PlasmaWarpBlast || head.ai[1] == AntimatterBomb)
+            if (head.ai[1] >= 0 && (head.ModNPC as SkyDestroyerHead).CurrentModule.ID > 1)
+            {
+                Music = Mod.GetSoundSlot(SoundType.Music, "Sounds/Music/BuryTheLight1");
+            }
+            if (head.ai[1] == -1)
+            {
+                ShowupAI();
+            }
+            else if (head.ai[1] == SpaceWarp || head.ai[1] == WarpMove || head.ai[1] == PlasmaWarpBlast || head.ai[1] == AntimatterBomb)
             {
                 WarpAI();
             }
             else
             {
-                if (NPC.Distance(previousSegment.Center) > 6)
-                {
-                    Vector2 offset = new Vector2(0, 1f);
-                    try//default behavior
-                    {
-                        offset = previousSegment.Center - NPC.Center;
-                    }
-                    catch { }
-                    if (offset == Vector2.Zero || offset.HasNaNs()) offset = new Vector2(0, 1f);
-                    var dist = SegDistance * NPC.scale;
-                    NPC.rotation = offset.ToRotation();
-                    offset -= Vector2.Normalize(offset) * dist;
-                    NPC.velocity = Vector2.Zero;
-                    NPC.position += offset;
-                }
+                NormalSegmentAI(previousSegment);
 
                 if (head.ai[1] == FireballBarrage)
                 {
@@ -106,20 +102,15 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                         {
                             NPC.localAI[0] = 0;
                             if (NPC.ai[3] == 0)
-                                Projectile.NewProjectile(NPC.GetProjectileSource(),NPC.Center, Vector2.UnitY * 10, ModContent.ProjectileType<SkyFireballLauncher>(),
+                                Projectile.NewProjectile(NPC.GetProjectileSource(), NPC.Center, Vector2.UnitY * 10, ModContent.ProjectileType<SkyFireballLauncher>(),
                                     NPC.damage * 2 / 3, 0f, Main.myPlayer, NPC.target, 0);
                             else if (NPC.ai[3] == 1)
-                                Projectile.NewProjectile(NPC.GetProjectileSource(),NPC.Center, -Vector2.UnitY * 10, ModContent.ProjectileType<SkyFireballLauncher>(),
+                                Projectile.NewProjectile(NPC.GetProjectileSource(), NPC.Center, -Vector2.UnitY * 10, ModContent.ProjectileType<SkyFireballLauncher>(),
                                     NPC.damage * 2 / 3, 0f, Main.myPlayer, NPC.target, 3);
                         }
                     }
                 }
             }
-        }
-        public override bool CanHitPlayer(Player target, ref int cooldownSlot)
-        {
-            cooldownSlot = 1;
-            return true;
         }
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
         {
@@ -136,9 +127,9 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             Texture2D texture2D = Terraria.GameContent.TextureAssets.Npc[NPC.type].Value;
             texture = Terraria.GameContent.TextureAssets.Npc[NPC.type].Value;
             texture2D = Mod.Assets.Request<Texture2D>("Glow/NPCs/SkyDestroyerBodyAltGlow").Value;
-            Color glowColor = Color.White;
-            SpriteEffects effects = (NPC.direction < 0) ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-            var mainColor = drawColor;
+            Color glowColor = NPC.GetAlpha(Color.White);
+            SpriteEffects effects = (base.NPC.direction < 0) ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+            var mainColor = NPC.GetAlpha(drawColor);
             spriteBatch.Draw(texture, NPC.Center - screenPos + new Vector2(0f, NPC.gfxOffY), new Rectangle?(NPC.frame), mainColor * NPC.Opacity, NPC.rotation + MathHelper.Pi / 2, NPC.frame.Size() / 2f, NPC.scale, effects, 0f);
             spriteBatch.Draw(texture2D, NPC.Center - screenPos + new Vector2(0f, NPC.gfxOffY), new Rectangle?(NPC.frame), glowColor * 0.75f * NPC.Opacity, NPC.rotation + MathHelper.Pi / 2, NPC.frame.Size() / 2f, NPC.scale, effects, 0f);
             return false;
