@@ -20,8 +20,8 @@ float4 PixelShaderFunction(float2 coords : TEXCOORD0) : COLOR0
 	float4 color = tex2D(uImage0, coords);
 	if (!any(color))
 		return color;
-	if (!any(uColor))
-		color = uColor;
+	if (any(float4(uColor,1)))
+		color *= float4(uColor,1);
 	float4 color1= tex2D( uImage1 , coords.xy);
 
 	float readRed = 1 - uOpacity;

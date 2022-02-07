@@ -16,8 +16,8 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 {
     public class SkyAimLine:ModProjectile
     {
-        Vector2 target;
-        public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.ShadowBeamHostile;
+        protected Vector2 target;
+        public override string Texture => MigrationUtils.ProjTexturePrefix + ProjectileID.ShadowBeamHostile;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Aim Line");
@@ -50,6 +50,14 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                 Player player = Main.player[head.target];
                 target = Projectile.Center + (player.Center - Projectile.Center).SafeNormalize(Vector2.Zero) * 3600;
             }
+            else if (Projectile.ai[1] == 2)
+            {
+                if (Util.CheckProjAlive((int)Projectile.ai[0]))
+                {
+                    Projectile mark = Main.projectile[(int)Projectile.ai[0]];
+                    target = mark.Center;
+                }
+            }
             Projectile.localAI[0]++;
             if (Projectile.localAI[0] > 45)
             {
@@ -58,7 +66,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
         }
         public override Color? GetAlpha(Color lightColor)
         {
-            if (Projectile.ai[1] == 0)
+            if (Projectile.ai[1] == 0 || Projectile.ai[1] == 2)
             {
                 return Color.Turquoise;
             }
@@ -72,9 +80,22 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                 Color alpha = Projectile.GetAlpha(lightColor);
                 if (timer <= 10) alpha *= timer / 10;
                 else if (timer >= 30) alpha *= (45 - timer) / 25;
-                Projectile.DrawAim(target, alpha);
+                Utils.DrawLine(Main.spriteBatch, Projectile.Center, target, alpha, alpha * 0.8f, 3);
             }
             return false;
+        }
+    }
+    public class SkyAimLineAlt : SkyAimLine
+    {
+        public override void AI()
+        {
+            Projectile.Loomup();
+            target = Projectile.ProjAIToVector();
+            Projectile.localAI[0]++;
+            if (Projectile.localAI[0] > 45)
+            {
+                Projectile.Kill();
+            }
         }
     }
 }

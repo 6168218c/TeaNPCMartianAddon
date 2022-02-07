@@ -12,13 +12,13 @@ using System.IO;
 using Terraria.Enums;
 using System.Collections.Generic;
 using Terraria.Localization;
-using Terraria.DataStructures;
+using Terraria.Audio;
 
 namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 {
     public class SkyMatterMissile : ModProjectile
     {
-        public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.SaucerMissile;
+        public override string Texture => MigrationUtils.ProjTexturePrefix + ProjectileID.SaucerMissile;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Matter Missile");
@@ -107,23 +107,23 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
         }
         public override void Kill(int timeLeft)
         {
-            Terraria.Audio.SoundEngine.PlaySound(SoundID.Item14, Projectile.position);
+            SoundEngine.PlaySound(SoundID.Item14, Projectile.position);
             Projectile.position = Projectile.Center;
             Projectile.width = (Projectile.height = 112);
             Projectile.position.X -= Projectile.width / 2;
             Projectile.position.Y -= Projectile.height / 2;
             for (int num363 = 0; num363 < 4; num363++)
             {
-                Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, 31, 0f, 0f, 100, default(Color), 1.5f);
+                Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, DustID.Smoke, 0f, 0f, 100, default(Color), 1.5f);
             }
 
             for (int num364 = 0; num364 < 40; num364++)
             {
-                int num365 = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, 228, 0f, 0f, 0, default(Color), 2.5f);
+                int num365 = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, DustID.GoldFlame, 0f, 0f, 0, default(Color), 2.5f);
                 Main.dust[num365].noGravity = true;
                 Dust dust = Main.dust[num365];
                 dust.velocity *= 3f;
-                num365 = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, 228, 0f, 0f, 100, default(Color), 1.5f);
+                num365 = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, DustID.GoldFlame, 0f, 0f, 100, default(Color), 1.5f);
                 dust = Main.dust[num365];
                 dust.velocity *= 2f;
                 Main.dust[num365].noGravity = true;
@@ -146,7 +146,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
     public class SkyAntimatterBombCenter : ModProjectile
     {
         int globalTimer = 0;
-        public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.ShadowBeamHostile;
+        public override string Texture => MigrationUtils.ProjTexturePrefix + ProjectileID.ShadowBeamHostile;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Antimatter Target");
@@ -179,7 +179,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                 for(int i = 0; i < 8; i++)
                 {
                     Vector2 offset = Projectile.rotation.ToRotationVector2().RotatedBy(MathHelper.TwoPi / 8 * i) * 450;
-                    Projectile.NewProjectile(new ProjectileSource_ProjectileParent(Projectile), Projectile.Center + offset, Vector2.Zero, ModContent.ProjectileType<SkyAntimatterBomb>(),
+                    base.Projectile.NewProjectile(Projectile.Center + offset, Vector2.Zero, ModContent.ProjectileType<SkyAntimatterBomb>(),
                         Projectile.damage, 0f, Main.myPlayer, Projectile.whoAmI, i);
                 }
             }
@@ -208,7 +208,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
             }
             else if (Projectile.ai[1] == 1)
             {
-                
+
             }
         }
         public override bool ShouldUpdatePosition() => false;
@@ -242,9 +242,18 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
         }
         public override void AI()
         {
+            if (Projectile.localAI[1] == 1)
+            {
+                Projectile.alpha += 25;
+                if (Projectile.alpha > 255)
+                {
+                    Projectile.alpha = 255;
+                }
+                return;
+            }
             if (!Util.CheckProjAlive<SkyAntimatterBombCenter>((int)Projectile.ai[0]))
             {
-                Projectile.Kill();
+                Projectile.localAI[1] = 1;
                 return;
             }
             Projectile.Loomup();
@@ -262,8 +271,8 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                         Projectile.Kill();
                         if (Main.netMode != NetmodeID.MultiplayerClient)
                         {
-                            Projectile.NewProjectile(new ProjectileSource_ProjectileParent(Projectile),Projectile.Center, Vector2.Zero, ModContent.ProjectileType<SkyAntimatterExplosion>(),
-                                Projectile.damage, 0f, Main.myPlayer, MathHelper.TwoPi, SkyAntimatterExplosion.DistanceToScreenDistance(450f));
+                            base.Projectile.NewProjectile(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<SkyAntimatterExplosion>(),
+                                Projectile.damage, 0f, Main.myPlayer, MathHelper.Pi, 360);
                         }
                         return;
                     }
@@ -272,8 +281,19 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 
             if (parent.ai[1] == 0)
             {
-                Vector2 offset = parent.rotation.ToRotationVector2().RotatedBy(MathHelper.TwoPi / parent.localAI[1] * Projectile.ai[1]) * 450;
-                Projectile.FastMovement(parent.Center + offset);
+                Projectile.localAI[0]++;
+                Vector2 offset = parent.rotation.ToRotationVector2().RotatedBy(MathHelper.TwoPi / parent.localAI[1] * Projectile.ai[1])
+                    * (250 + (float)Math.Sin(Projectile.localAI[0] * Math.PI / 30) * 200);
+                Vector2 dest = parent.Center + offset;
+                if (Projectile.DistanceSQ(dest) > 60 * 60)
+                {
+                    Projectile.FastMovement(dest);
+                }
+                else
+                {
+                    Projectile.Center = dest;
+                    Projectile.velocity = Vector2.Zero;
+                }
             }
             else if (parent.ai[1] == 1)
             {
@@ -282,23 +302,24 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
         }
         public override bool PreDraw(ref Color lightColor)
         {
+            SpriteBatch spriteBatch = Main.spriteBatch;
             Texture2D texture2D13 = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
             int num156 = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value.Height / Main.projFrames[Projectile.type]; //ypos of lower right corner of sprite to draw
             int y3 = num156 * Projectile.frame; //ypos of upper left corner of sprite to draw
             Rectangle rectangle = new Rectangle(0, y3, texture2D13.Width, num156);
             Vector2 origin2 = rectangle.Size() / 2f;
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.GameViewMatrix.ZoomMatrix);
-            Main.EntitySpriteDraw(texture2D13, Projectile.Center - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Projectile.GetAlpha(Color.White), Projectile.rotation, origin2, Projectile.scale * 1.25f, SpriteEffects.None, 0);
-            List<VertexStripInfo> vertices = new List<VertexStripInfo>();
-            for (int i = 1; i < Projectile.oldPos.Length; i++)
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Draw(texture2D13, Projectile.Center - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Projectile.GetAlpha(Color.White), Projectile.rotation, origin2, Projectile.scale * 1.25f, SpriteEffects.None, 0f);
+            /*List<VertexStripInfo> vertices = new List<VertexStripInfo>();
+            for (int i = 1; i < projectile.oldPos.Length; i++)
             {
-                if (Projectile.oldPos[i] == Vector2.Zero) break;
+                if (projectile.oldPos[i] == Vector2.Zero) break;
 
-                var dir = Projectile.oldPos[i - 1] - Projectile.oldPos[i];
+                var dir = projectile.oldPos[i - 1] - projectile.oldPos[i];
                 dir = dir.SafeNormalize(Vector2.Zero).RotatedBy(Math.PI / 2);
 
-                var factor = i / (float)Projectile.oldPos.Length;
+                var factor = i / (float)projectile.oldPos.Length;
                 var alpha = MathHelper.SmoothStep(1f, 0.5f, factor);
 
                 float width = MathHelper.SmoothStep(0, 20, Math.Min(1, 2.5f * factor));
@@ -308,35 +329,35 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                     width *= (float)(3 - i) / 3;
                 }
 
-                Vector2 d = Projectile.oldPos[i - 1] - Projectile.oldPos[i];
-                vertices.Add(new VertexStripInfo((Projectile.oldPos[i] - d * i * 0.4f) + dir * width, Color.White * (1 - factor), new Vector3((float)Math.Sqrt(factor), 1, alpha)));
-                vertices.Add(new VertexStripInfo((Projectile.oldPos[i] - d * i * 0.35f) + dir * -width, Color.White * (1 - factor), new Vector3((float)Math.Sqrt(factor), 0, alpha)));
+                Vector2 d = projectile.oldPos[i - 1] - projectile.oldPos[i];
+                vertices.Add(new VertexStripInfo((projectile.oldPos[i] - d * i * 0.4f) + dir * width, Color.White * (1 - factor), new Vector3((float)Math.Sqrt(factor), 1, alpha)));
+                vertices.Add(new VertexStripInfo((projectile.oldPos[i] - d * i * 0.35f) + dir * -width, Color.White * (1 - factor), new Vector3((float)Math.Sqrt(factor), 0, alpha)));
             }
 
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullNone);
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullNone);
 
             var projection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, 0, 1);
             var model = Matrix.CreateTranslation(new Vector3(-Main.screenPosition.X, -Main.screenPosition.Y, 0)) * Main.GameViewMatrix.TransformationMatrix;
 
-            TeaNPCMartianAddon.Trail.Parameters["uTransform"].SetValue(model * projection);
-            TeaNPCMartianAddon.Trail.Parameters["uTime"].SetValue(Projectile.timeLeft * 0.04f);
-            TeaNPCMartianAddon.Trail.Parameters["alpha"].SetValue(Projectile.Opacity);
+            TeaNPCAddon.Trail.Parameters["uTransform"].SetValue(model * projection);
+            TeaNPCAddon.Trail.Parameters["uTime"].SetValue(projectile.timeLeft * 0.04f);
+            TeaNPCAddon.Trail.Parameters["alpha"].SetValue(projectile.Opacity);
 
-            Main.graphics.GraphicsDevice.Textures[0] = Mod.Assets.Request<Texture2D>("Images/Extra_193").Value;
+            Main.graphics.GraphicsDevice.Textures[0] = Mod.RequestTexture("Images/Extra_193");
 
             Main.graphics.GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
             Main.graphics.GraphicsDevice.SamplerStates[1] = SamplerState.PointClamp;
             Main.graphics.GraphicsDevice.SamplerStates[2] = SamplerState.PointClamp;
 
-            TeaNPCMartianAddon.Trail.CurrentTechnique.Passes[0].Apply();
+            TeaNPCAddon.Trail.CurrentTechnique.Passes[0].Apply();
 
             if (vertices.Count >= 3)
-                Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, vertices.ToArray(), 0, vertices.Count - 2);
+                Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, vertices.ToArray(), 0, vertices.Count - 2);*/
 
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
-            Main.EntitySpriteDraw(texture2D13, Projectile.Center - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Projectile.GetAlpha(Color.Black), Projectile.rotation, origin2, Projectile.scale, SpriteEffects.None, 0);
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+            Main.spriteBatch.Draw(texture2D13, Projectile.Center - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Projectile.GetAlpha(Color.Black), Projectile.rotation, origin2, Projectile.scale, SpriteEffects.None, 0f);
             return false;
         }
     }
@@ -346,11 +367,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
         {
             return dist * Main.GameViewMatrix.Zoom.Y / Main.screenHeight;
         }
-        public float R
-        {
-            get => Projectile.ai[1] * Main.screenHeight / Main.GameViewMatrix.Zoom.Y;
-            set => Projectile.ai[1] = value * Main.GameViewMatrix.Zoom.Y / Main.screenHeight;
-        }
+        public float R { get => Projectile.ai[1]; set => Projectile.ai[1] = value; }
         public override string Texture => $"{nameof(TeaNPCMartianAddon)}/Projectiles/Boss/SkyDestroyer/GlowRing";
         public override void SetStaticDefaults()
 		{
@@ -376,9 +393,9 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                 {
 					Filters.Scene.Activate("TeaNPCAddon:CircularDistort")
 						.GetShader()
-						.UseTargetPosition(Projectile.Center)
-						.UseIntensity(Projectile.ai[0])
-						.UseProgress(Projectile.ai[1]);
+						.UseTargetPosition(projectile.Center)
+						.UseIntensity(projectile.ai[0])
+						.UseProgress(projectile.ai[1]);
 				}
             }*/
 
@@ -411,8 +428,9 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.GameViewMatrix.ZoomMatrix);
+            SpriteBatch spriteBatch=Main.spriteBatch;
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.GameViewMatrix.ZoomMatrix);
             Texture2D texture2D13 = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
             int num156 = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value.Height / Main.projFrames[Projectile.type]; //ypos of lower right corner of sprite to draw
             int y3 = num156 * Projectile.frame; //ypos of upper left corner of sprite to draw
@@ -420,23 +438,24 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
             Vector2 origin2 = rectangle.Size() / 2f;
             float scale = R / rectangle.Width * 2.5f;
 
-            Main.EntitySpriteDraw(texture2D13, Projectile.Center - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Projectile.GetAlpha(Color.White), Projectile.rotation, origin2, scale * 1.25f, SpriteEffects.None, 0);
-            Main.EntitySpriteDraw(texture2D13, Projectile.Center - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Projectile.GetAlpha(Color.White), Projectile.rotation, origin2, scale, SpriteEffects.None, 0);
-            Texture2D mask = Mod.Assets.Request<Texture2D>("Images/Extra_49").Value;
+            Main.spriteBatch.Draw(texture2D13, Projectile.Center - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Projectile.GetAlpha(Color.White), Projectile.rotation, origin2, scale * 1.25f, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(texture2D13, Projectile.Center - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Projectile.GetAlpha(Color.White), Projectile.rotation, origin2, scale, SpriteEffects.None, 0f);
+            Texture2D mask = Mod.RequestTexture("Images/Extra_49");
             rectangle = new Rectangle(0, 0, mask.Width, mask.Height);
             scale = R / mask.Width * 2.5f;
             origin2 = rectangle.Size() / 2f;
-            Main.EntitySpriteDraw(mask,Projectile.Center-Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle),Color.White*Projectile.Opacity, Projectile.rotation, origin2, scale, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(mask,Projectile.Center-Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle),Color.White*Projectile.Opacity, Projectile.rotation, origin2, scale, SpriteEffects.None, 0f);
 
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.GameViewMatrix.ZoomMatrix);
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.GameViewMatrix.ZoomMatrix);
             return false;
         }
         public override void Kill(int timeLeft)
         {
 			base.Kill(timeLeft);
         }
-		public static void DrawWithShaders_EndCapture(On.Terraria.Graphics.Effects.FilterManager.orig_EndCapture orig, FilterManager self, RenderTarget2D finalTexture, RenderTarget2D screenTarget1, RenderTarget2D screenTarget2, Microsoft.Xna.Framework.Color clearColor)
+        [Obsolete]
+		public static void DrawWithShaders_EndCapture(On.Terraria.Graphics.Effects.FilterManager.orig_EndCapture orig, FilterManager self)
         {
 			GraphicsDevice graphicsDevice = Main.graphics.GraphicsDevice;
             RenderTarget2D renderTarget2D = null;
@@ -447,13 +466,13 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                 {
                     renderTarget2D = ((renderTarget2D2 != Main.screenTarget) ? Main.screenTarget : Main.screenTargetSwap);
                     graphicsDevice.SetRenderTarget(renderTarget2D);
-                    graphicsDevice.Clear(clearColor);
+                    graphicsDevice.Clear(Color.Black);
                     Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
                     Filters.Scene["TeaNPCAddon:CircularDistort"]
                         .GetShader()
                         .UseTargetPosition(proj.Center)
                         .UseIntensity(proj.ai[0])
-                        .UseProgress(proj.ai[1])
+                        .UseProgress(DistanceToScreenDistance(proj.ai[1]))
                         .Apply();
                     Main.spriteBatch.Draw(renderTarget2D2, Vector2.Zero, Main.ColorOfTheSkies);
                     Main.spriteBatch.End();
@@ -464,14 +483,14 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
             {
                 renderTarget2D = ((renderTarget2D2 != Main.screenTarget) ? Main.screenTarget : Main.screenTargetSwap);
                 graphicsDevice.SetRenderTarget(renderTarget2D);
-                graphicsDevice.Clear(clearColor);
+                graphicsDevice.Clear(Color.Black);
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
                 Main.spriteBatch.Draw(renderTarget2D2, Vector2.Zero, Color.White);
                 Main.spriteBatch.End();
                 renderTarget2D2 = ((renderTarget2D2 != Main.screenTarget) ? Main.screenTarget : Main.screenTargetSwap);
             }
 
-            orig(self, finalTexture, screenTarget1, screenTarget2, clearColor);
+            
         }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {

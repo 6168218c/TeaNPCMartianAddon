@@ -273,9 +273,10 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             projectile.alpha -= rate;
             if (projectile.alpha < 0) projectile.alpha = 0;
         }
-        public static void DrawAim(this Entity entity, Vector2 endpoint, Color color)
+        public static void DrawAim(this Entity entity, SpriteBatch spriteBatch, Vector2 endpoint, Color color, float endAlpha = 0.8f)
         {
-            Texture2D aimTexture = ModContent.GetInstance<TeaNPCMartianAddon>().Assets.Request<Texture2D>("Projectiles/Boss/SkyDestroyer/AimLine").Value;
+            Utils.DrawLine(spriteBatch, entity.Center, endpoint, color, color*endAlpha, 3);
+            /*Texture2D aimTexture = ModContent.GetInstance<TeaNPCAddon>().RequestTexture("Projectiles/Boss/SkyDestroyer/AimLine");
             Vector2 unit = endpoint - entity.Center;
             float length = unit.Length();
             unit.Normalize();
@@ -283,8 +284,8 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             {
                 Vector2 drawPos = entity.Center + unit * k - Main.screenPosition;
                 Color alphaCenter = color * 0.8f;
-                Main.EntitySpriteDraw(aimTexture, drawPos, null, alphaCenter, k, new Vector2(2, 2), 1f, SpriteEffects.None, 0);
-            }
+                spriteBatch.Draw(aimTexture, drawPos, null, alphaCenter, k, new Vector2(2, 2), 1f, SpriteEffects.None, 0f);
+            }*/
         }
         public static bool CheckNPCAlive<T>(int index)where T : ModNPC
         {
@@ -341,8 +342,6 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             }
             return false;
         }
-        public static IProjectileSource GetProjectileSource(this NPC npc) => new ProjectileSource_NPC(npc);
-        public static IProjectileSource GetProjectileSource(this Projectile projectile) => new ProjectileSource_ProjectileParent(projectile);
         public static Vector2 ProjAIToVector(this Projectile projectile)
         {
             return new Vector2(projectile.ai[0], projectile.ai[1]);
@@ -354,7 +353,8 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             else if (vecLen == length * length) return 0;
             else return -1;
         }
-        public static Vector2 LerpClamped(Vector2 value1, Vector2 value2, float amount)
+        
+        public static Vector2 LerpClamped(Vector2 value1,Vector2 value2,float amount)
         {
             if (amount <= 0) return value1;
             else if (amount >= 1) return value2;
@@ -383,6 +383,43 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             }
 
             return (t - from) / (to - from);
+        }
+    }
+    public static class MigrationUtils
+    {
+        public static string ProjTexturePrefix => "Terraria/Images/Projectile_";
+        public static string NPCTexturePrefix => "Terraria/Images/NPC_";
+        public static Texture2D RequestTexture(this Mod mod, string name)
+        {
+            return mod.Assets.Request<Texture2D>(name).Value;
+        }
+        public static int GetGoreType(this Mod mod,string name)
+        {
+            return mod.Find<ModGore>(name).Type;
+        }
+        public static void AddChineseTranslation(this ModTranslation displayName,string value)
+        {
+            displayName.AddTranslation(GameCulture.FromCultureName(GameCulture.CultureName.Chinese), value);
+        }
+        public static int NewProjectile(this Projectile projectile, Vector2 position, Vector2 velocity, 
+            int Type, int Damage, float KnockBack, int Owner = 255, float ai0 = 0, float ai1 = 0)
+        {
+            return Projectile.NewProjectile(new ProjectileSource_ProjectileParent(projectile), position, velocity, Type, Damage, KnockBack, Owner, ai0, ai1);
+        }
+        public static int NewProjectile(this NPC npc, Vector2 position, Vector2 velocity,
+            int Type, int Damage, float KnockBack, int Owner = 255, float ai0 = 0, float ai1 = 0)
+        {
+            return Projectile.NewProjectile(new ProjectileSource_NPC(npc), position, velocity, Type, Damage, KnockBack, Owner, ai0, ai1);
+        }
+        public static Projectile NewProjectileDirect(this Projectile projectile, Vector2 position, Vector2 velocity,
+            int Type, int Damage, float KnockBack, int Owner = 255, float ai0 = 0, float ai1 = 0)
+        {
+            return Projectile.NewProjectileDirect(new ProjectileSource_ProjectileParent(projectile), position, velocity, Type, Damage, KnockBack, Owner, ai0, ai1);
+        }
+        public static Projectile NewProjectileDirect(this NPC npc, Vector2 position, Vector2 velocity,
+            int Type, int Damage, float KnockBack, int Owner = 255, float ai0 = 0, float ai1 = 0)
+        {
+            return Projectile.NewProjectileDirect(new ProjectileSource_NPC(npc), position, velocity, Type, Damage, KnockBack, Owner, ai0, ai1);
         }
     }
 }

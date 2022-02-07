@@ -3,7 +3,9 @@ sampler uImage1 : register(s1);
 sampler uImage2 : register(s2);
 float4x4 uTransform;
 float uTime;
+float uTimeVert;
 float alpha;
+bool complexTexture;
 
 struct VSInput
 {
@@ -31,10 +33,12 @@ PSInput VSMain(VSInput input)
 float4 PSMain(PSInput input) : COLOR0
 {
 	float3 coord = input.Texcoord;
-	float4 c = tex2D(uImage0, float2(coord.x + uTime , coord.y));
+	float4 c = tex2D(uImage0, float2(coord.x + uTime , coord.y+uTimeVert));
     //c += tex2D(uImage2, float2(1 - coord.x * 5, coord.y));
 	//c *= coord.z;
 	//c *= tex2D(uImage1, float2(c.r,0.5));//颜色图
+	if (complexTexture)
+		c += tex2D(uImage2, float2(1 - coord.x * 5, coord.y));
 	c *= input.Color;
 	c *= alpha;
 	return c * 1.2;

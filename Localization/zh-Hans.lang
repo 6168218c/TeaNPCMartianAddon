@@ -325,123 +325,20 @@ Common.TALeave =已离开!
 
 Common.ModName =[c/ffca18:茶馆的各位们;D]
 
-TeaNPCArmorSetBouns.ShadowstarRanged =所有远程攻击造成星影焰减益\n双击UP进入隐身模式，移动速度降低50%，大大减少玩家的嘲讽\n隐身模式下你的远程伤害和暴击率随移动速度增长(1%/每mph)
-TeaNPCArmorSetBouns.ShadowstarMelee =所有近战攻击造成星影焰减益\n近战暴击时有25%几率获得5秒的'星影之力'Buff并恢复自身10点生命值，8秒CD\n'星影之力'会将近战伤害和近战攻速各提升20%
-TeaNPCArmorSetBouns.ShadowstarMagic =所有魔法攻击造成星影焰减益\n魔法暴击时获得持续15秒的'末星之怒'Buff，Buff最多可以叠加十五层，受伤时清空\n“末星之怒”每层增加2%魔法伤害、2%魔法暴击率和1%伤害减免
-TeaNPCArmorSetBouns.ShadowstarSummon =所有召唤攻击造成星影焰减益\n召唤四个不占用召唤栏的星影构造体为你而战
-
-TeaNPCArmorSetBouns.CurrentSummon =召唤一圈泡泡保护你
-TeaNPCArmorSetBouns.CurrentMelee =使用近战武器打击敌人会获得'龙鱼力量'Buff，不断打击则Buff会升级\n如果受伤,Buff会被削减且会获得'龙鱼诅咒'Debuff
-TeaNPCArmorSetBouns.CurrentRanged =攻击时发射鲨鱼龙
-TeaNPCArmorSetBouns.CurrentMagic =按下'{$Mods.TeaNPC.Common.SetEffect}'键会向四周释放大量利刃台风，30秒CD
-
-TeaNPCArmorSetBouns.GunWitch =提高哨兵数量上限\n机枪哨兵射击速度更快且有几率发射火箭
-TeaNPCArmorSetBouns.EV2 =提高哨兵数量上限\n质子光束哨兵攻击的更快
-TeaNPCArmorSetBouns.AbyssLord =提高哨兵数量上限\n深渊章鱼哨兵攻击范围更远\n按下'{$Mods.TeaNPC.Common.SetEffect}'键以强化哨兵
-
-TeaNPCWorldgen.IcePalace =构建冰宫
-TeaNPCWorldgen.StartHouse =生成你的第一个家
-
-TeaNPCRecipes.DungonLantern = 地牢灯笼
-
-TeaNPCDropCondition.Thunder =仅当第一次击败{$Mods.TeaNPC.NPCName.ThunderCloud}时掉落
-TeaNPCDropCondition.PostGolem =仅当击败{$NPCName.Golem}后掉落
-TeaNPCDropCondition.WorldState =仅当世界处于
-TeaNPCDropCondition.HardMode =困难模式时掉落
-TeaNPCDropCondition.PreHard =困难模式前时掉落
-TeaNPCDropCondition.KillMoodLord =仅当击杀月球领主满
-TeaNPCDropCondition.Kill15 =15次时掉落
-TeaNPCDropCondition.Kill30 =30次时掉落
-
-TeaNPCConfig.StartHouse =生成初始小屋
-TeaNPCConfig.StartHouseTooltip =是, 以在世界生成时生成初始小屋, 否, 以取消. 默认为是
-TeaNPCConfig.IcePalace =生成冰雪宫殿
-TeaNPCConfig.IcePalaceTooltip =是, 以在世界生成时生成冰雪宫殿, 否, 以取消. 默认为是
-TeaNPCConfig.DevMode =开发者模式
-TeaNPCConfig.DevModeTooltip =你不应该使用此选项
-TeaNPCConfig.CanChange =设置改动成功!
-TeaNPCConfig.CantChange =你没有设置改动权限
-
-TeaNPCConfig.BdSpawn ={$Mods.TeaNPC.NPCName.bd}生成开关
-TeaNPCConfig.BdSpawnTooltip =是, 以激活{$Mods.TeaNPC.NPCName.bd}NPC生成, 否, 以取消. 默认为是
-
-TeaNPCConfig.ClSpawn ={$Mods.TeaNPC.NPCName.Cl}生成开关
-TeaNPCConfig.ClSpawnTooltip =是, 以激活{$Mods.TeaNPC.NPCName.Cl}NPC生成, 否, 以取消. 默认为是
-
-TeaNPCConfig.CyrilSpawn ={$Mods.TeaNPC.NPCName.Cyril}生成开关
-TeaNPCConfig.CyrilSpawnTooltip =是, 以激活{$Mods.TeaNPC.NPCName.Cyril} NPC生成, 否, 以取消. 默认为是
-
-TeaNPCConfig.D5Spawn ={$Mods.TeaNPC.NPCName.D5}生成开关
-TeaNPCConfig.D5SpawnTooltip =是, 以激活{$Mods.TeaNPC.NPCName.D5}NPC生成, 否, 以取消. 默认为是
-
-TeaNPCConfig.GoldFishSpawn ={$Mods.TeaNPC.NPCName.GoldFish}生成开关
-TeaNPCConfig.GoldFishSpawnTooltip =是, 以激活{$Mods.TeaNPC.NPCName.GoldFish}NPC生成, 否, 以取消. 默认为是
-
-TeaNPCConfig.MasSpawn ={$Mods.TeaNPC.NPCName.Mas}生成开关
-TeaNPCConfig.MasSpawnTooltip =是, 以激活{$Mods.TeaNPC.NPCName.Mas}NPC生成, 否, 以取消. 默认为是
-
-TeaNPCConfig.NumSpawn ={$Mods.TeaNPC.NPCName.num}生成开关
-TeaNPCConfig.NumSpawnTooltip =是, 以激活{$Mods.TeaNPC.NPCName.num}NPC生成, 否, 以取消. 默认为是
-
-TeaNPCConfig.PaperSpawn ={$Mods.TeaNPC.NPCName.paper}生成开关
-TeaNPCConfig.PaperSpawnTooltip =是, 以激活{$Mods.TeaNPC.NPCName.paper}NPC生成, 否, 以取消. 默认为是
-
-TeaNPCConfig.ShadowFlameMasterSpawn ={$Mods.TeaNPC.NPCName.ShadowFlameMaster}生成开关
-TeaNPCConfig.ShadowFlameMasterSpawnTooltip =是, 以激活{$Mods.TeaNPC.NPCName.ShadowFlameMaster}NPC生成, 否, 以取消. 默认为是
-
-TeaNPCConfig.SnowyySpawn ={$Mods.TeaNPC.NPCName.Snowyy}生成开关
-TeaNPCConfig.SnowyySpawnTooltip =是, 以激活{$Mods.TeaNPC.NPCName.Snowyy}NPC生成, 否, 以取消. 默认为是
-
-TeaNPCConfig.HunteressSpawn ={$Mods.TeaNPC.NPCName.Hunteress}生成开关
-TeaNPCConfig.HunteressSpawnTooltip =是, 以激活{$Mods.TeaNPC.NPCName.Hunteress}NPC生成, 否, 以取消. 默认为是
-
-TeaNPCConfig.CookSpawn ={$Mods.TeaNPC.NPCName.Cook}生成开关
-TeaNPCConfig.CookSpawnTooltip =是, 以激活{$Mods.TeaNPC.NPCName.Cook}NPC生成, 否, 以取消. 默认为是
-
-TeaNPCConfig.DSisterSpawn ={$Mods.TeaNPC.NPCName.DryadSister}生成开关
-TeaNPCConfig.DSisterSpawnTooltip =是, 以激活{$Mods.TeaNPC.NPCName.DryadSister}NPC生成, 否, 以取消. 默认为是
-
 NPCChat.AuthorSleep1 =哦，额.....我现在在哪儿...嘿!你是谁？!
 NPCChat.AuthorSleep2 =嗯......是你..叫醒了我？很好，作为回报，我要....去你的镇上玩玩!
 NPCChat.ClSleep =啊呃呃.....头疼...哦啊？!我还活着？你救了我？
 NPCChat.HunteressFall =嗯呃呃——...............哇!你是谁？我又是在哪？？发生了什么啊啊啊啊啊啊!!!!!!!!!......\n(*此处省略了你对她的耐心讲解)
 
 NPCChat.SD1 =任务完成，目标已报废。
+NPCChat.SDEX0 =目标已锁定，传送例程进行中。
 NPCChat.SDEX1 =攻击模式启动。等离子武器已装备。
 NPCChat.SDEX2 =警报！跃迁模块已启动！
-NPCChat.SDEX3 =警报！检测到严重机体损毁！反物质武器就绪！
+NPCChat.SDEX3 =警报！检测到严重机体损毁！终结级AI已启动！
 
-TeaNPCBestiary.Wan =缇诺是来自另一个次元的神秘艺术家，如果你对她好，也许她会考虑帮你画张画。
-TeaNPCBestiary.Mahoganiling =本是一个树妖的掩体，却逐渐演化出了自我意识并随时准备撕碎唤醒它的无知者。
-TeaNPCBestiary.SFSprite =游荡于世界各地的妖灵，一旦找到主人，就会安定下来并与其相适应。这家伙就是个很好的例子。
-TeaNPCBestiary.ZombieFish =被吃了一半的鱼被丢到水里，重新开始活动，准备吃掉那些不慎入水的活物。
-TeaNPCBestiary.Planty =他们常说：不要被事物的体积所迷惑。他们常说：不要轻视任何丛林的造物。他们常说：要避开粉红色的花苞。
-TeaNPCBestiary.MarbleElemental =大地元素通过利用不同材料（比如这种古老的大理岩）的特性来呈现多种外形。它偶尔会释放能量攻击对手。
-TeaNPCBestiary.Cook =没有谁比茶馆御厨更懂做饭，他的烹饪法汇集大江南北之精华，随时为你奉上可口大餐。
-TeaNPCBestiary.Author =迷一样的孩子，高傲自大，态度恶劣，又无所不知。你甚至搞不清楚TA的性别。
-TeaNPCBestiary.Snowyy =冰雪魔仙长年独自居住在冰宫里。她沉着冷静，又渴望交际，对冰雪魔法的掌握可谓得心应手。
-TeaNPCBestiary.ShadowFlameMaster =身为'世界探险队'的领导者，暗影烈焰使带领着他的团队满世界跑，他会出售一些神奇的暗影焰道具。
-TeaNPCBestiary.paper =仙灵女仆热衷于干她的本职工作：干家务活，她还会用魂火魔法驱逐敌人。
-TeaNPCBestiary.num =常年漂泊在外，流浪者累积了丰富的野外经验，他在飞镖这块领域可以算是专家级人物。
-TeaNPCBestiary.Mas =月光斗士的热情正如她熟练掌握的月炎魔法一样旺盛，她会提供很多有用的战斗装备以及战斗信息。
-TeaNPCBestiary.Hunteress =游侠和酒馆老板一样来自艾特尼亚世界。如果你有意愿去击败撒旦军团，她也能提供很多帮助。
-TeaNPCBestiary.Goldfish =一般的金鱼都傻傻的，这条可不一样。他懂得的道理或许比你还多。
-TeaNPCBestiary.DryadSister =对于树妖族而言，她就是另一个希望。和她的姐姐一样，她也擅长自然魔法，但似乎更具攻击性。
-TeaNPCBestiary.DOD =来自另一个维度的杜格是一个纯粹的摸鱼仔，尽管能免费做事,但如果不付她钱的话或许会变的慵懒。
-TeaNPCBestiary.Cyril =Cyril就是Cyril，这个科技迷经常捣鼓一些神奇玩意儿，他偶尔会分配一些有偿任务。
-TeaNPCBestiary.StarWitch =这个调皮的小女巫喜欢用她那拿不完的星星乱砸那些胆敢呼唤她的人。她有一个朋友，至少曾经。
-TeaNPCBestiary.Cl =炼金师钟爱那些稀奇古怪的药水，为此甚至可以独自深入险地。对他而言，炼药桌就是一切。
-TeaNPCBestiary.D5 =黑洞指挥官是否真的是指挥官尚且不可知，他拥有一些高级军用装备，用来交易或者清除敌对目标。
-TeaNPCBestiary.StarBroom =作为一个值得女巫信赖的助手，这把星之扫帚可以帮助主人把敌人扫地出门。
-TeaNPCBestiary.ThunderCloud =雷雨天气造就了这朵古怪的云。它会慷慨的把体内的雷电送给来犯者...以魔法攻击的形式!
 TeaNPCBestiary.SkySearcher =火星人用于进行探测任务的机械蠕虫，也会被用于战争。它们装配有激光武器，用以打击目标。
 TeaNPCBestiary.SkyProbe =从天际毁灭者的体节舱内分离出来，天际探测器除了当作勘探先锋，还可以辅助母舰进行围剿攻击。
-TeaNPCBestiary.SkyDestroyer =火星人用于进行采矿兼侵略任务的巨型机械蠕虫。凭借庞大的体型和锋利的虫颚，它能碾碎一切拦路者。
+TeaNPCBestiary.SkyDestroyer =火星人在天际毁灭者基础上研发的巨型战争机器，配备了多种先进武器。
 TeaNPCBestiary.SkyChaser =从天际毁灭者的体节舱内分离出来，天际追击者依靠极快的速度和危险的电击矢予以目标重创。
-TeaNPCBestiary.SFMBoss =暗影烈焰使解除了力量限制，已经准备好一战，不全力以赴只会付出惨痛代价!
-TeaNPCBestiary.D5Boss =黑洞指挥官全副武装，已经蓄势待发，准备好迎接枪林弹雨!
-TeaNPCBestiary.BD =魔法乐师出生于一个古老的音乐贵族世家，她精通音乐，更懂得如何把音乐和魔法结合起来。
-TeaNPCBestiary.AbyssalOctopus =来自深渊的诡异生物。依靠强力的触手对猎物施加深渊诅咒，使之彻底动弹不得。
-
 
 

@@ -13,6 +13,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
 {
     public abstract class SkyDestroyerSegment:ModNPC
     {
+        protected static float BackgroundScale => 0.2f;
         public static int LightningStorm => 0;
         public static int FireballBarrage => 1;
         public static int Plasmerizer => 2;
@@ -20,9 +21,13 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         public static int PlasmaWarpBlast => 4;
         public static int SpaceWarp => 5;
         public static int AntimatterBomb => 6;
-        public static int AntimatterBomb2 => 7;
-        protected float WarpState { get => base.NPC.localAI[2]; set => base.NPC.localAI[2] = value; }
-        protected int WarpMark { get => (int)base.NPC.localAI[3]; set => base.NPC.localAI[3] = value; }
+        public static int LightningStormEx => 7;
+        public static int FireballBarrageEx => 8;
+        public static int ResetStates => 19;
+        public static int DeathAnimation0 => 20;
+        public static int DeathAnimation1 => 21;
+        protected float WarpState { get => NPC.localAI[2]; set => NPC.localAI[2] = value; }
+        protected int WarpMark { get => (int)NPC.localAI[3]; set => NPC.localAI[3] = value; }
         public static int warpDistance => 78;
         public static Vector2 GetLinkPoint(NPC seg)
         {
@@ -40,7 +45,6 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 Main.instance.DrawCacheNPCsMoonMoon.Add(index);
             }
         }
-        public static float BackgroundScale => 0.2f;
         public override Color? GetAlpha(Color drawColor)
         {
             if (NPC.hide)
@@ -49,20 +53,33 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             }
             return null;
         }
-        public Vector2 GetDrawPosition()
+        protected bool viberation;
+        protected void SetViberation() => viberation = true;
+        public Vector2 GetDrawPosition(Vector2 screenPos)
         {
             if (NPC.hide)
             {
-                Vector2 value2 = Main.screenPosition + new Vector2(Main.screenWidth >> 1, Main.screenHeight >> 1);
-                float depth = 1f;
-                Vector2 value3 = new Vector2(1f / depth, 0.9f / depth);
-                Vector2 position = NPC.Center + new Vector2(0f, NPC.gfxOffY);
-                position = (position - value2) * value3 + value2 - Main.screenPosition;
-                return position;
+                NPC head = NPC;
+                if (NPC.realLife != -1) head = Main.npc[NPC.realLife];
+                if (head.ai[1] == -2)
+                {
+                    Vector2 value2 = screenPos + new Vector2(Main.screenWidth >> 1, Main.screenHeight >> 1);
+                    float depth = MathHelper.SmoothStep(1.6f, 1f, head.ai[2] / 12 / 60);
+                    Vector2 value3 = new Vector2(1f / depth, 0.9f / depth);
+                    Vector2 position = NPC.Center + new Vector2(0f, NPC.gfxOffY);
+                    position = (position - value2) * value3 + value2 - screenPos;
+                    return position;
+                }
+                else
+                {
+                    return NPC.Center - screenPos + new Vector2(0f, NPC.gfxOffY);
+                }
             }
             else
             {
-                return NPC.Center - Main.screenPosition + new Vector2(0f, NPC.gfxOffY);
+                Vector2 offset = Vector2.Zero;
+                if (viberation) offset = Main.rand.NextVector2CircularEdge(20, 20);
+                return NPC.Center - screenPos + new Vector2(0f, NPC.gfxOffY) + offset;
             }
         }
         public override void ModifyHitByProjectile(Projectile projectile, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
@@ -74,14 +91,29 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         protected void SetBackground()
         {
             NPC.hide = true;
-            NPC.scale = 0.1f;
-            NPC.dontTakeDamage = true;
+            NPC.scale = BackgroundScale;
         }
         protected void SetForeground()
         {
             NPC.hide = false;
             NPC.scale = 1f;
-            NPC.dontTakeDamage = false;
+        }
+        protected void BodyPreventDeath()
+        {
+            if (NPC.ai[3] < 0)
+            {
+                return;
+            }
+            if (Util.CheckNPCAlive<SkyDestroyerHead>(NPC.realLife))
+            {
+                NPC head = Main.npc[NPC.realLife];
+                if (head.ai[1] < DeathAnimation1)
+                {
+                    NPC.life = 1;
+                    NPC.dontTakeDamage = true;
+                    return;
+                }
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ using Terraria.ModLoader;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Terraria.Localization;
+using Terraria.GameContent;
 using TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer;
 
 namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
@@ -14,7 +15,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         public override void SetStaticDefaults()
         {
             //DisplayName.SetDefault("The Sky Destroyer");
-            //DisplayName.AddTranslation(GameCulture.Chinese, "天际毁灭者");
+            //DisplayName.AddTranslation(GameCulture.FromCultureName(GameCulture.CultureName.Chinese), "天际毁灭者");
         }
         public override void SetDefaults()
         {
@@ -22,7 +23,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             NPC.width = 150;
             NPC.height = 150;
             NPC.defense = 100;
-            this.Music = Mod.GetSoundSlot(SoundType.Music, "Sounds/Music/BuryTheLight0");
+            this.Music = MusicLoader.GetMusicSlot($"{nameof(TeaNPCMartianAddon)}/Sounds/Music/BuryTheLight");
             NPC.lifeMax = 650000;
             NPC.aiStyle = -1;
             this.AnimationType = 10;
@@ -39,18 +40,36 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             {
                 NPC.buffImmune[i] = true;
             }
-
-            NPC.hide = true;
         }
         public override void AI()
         {
             bool expertMode = Main.expertMode;
             Lighting.AddLight((int)((NPC.position.X + (float)(NPC.width / 2)) / 16f), (int)((NPC.position.Y + (float)(NPC.height / 2)) / 16f), 0.2f, 0.05f, 0.2f);
-            if (!Main.npc[(int)NPC.ai[1]].active)
+            if (!Main.npc[(int)NPC.ai[1]].active || !Util.CheckNPCAlive<SkyDestroyerHead>(NPC.realLife))
             {
                 NPC.life = 0;
-                NPC.HitEffect(0, 10.0);
-                NPC.active = false;
+                if (NPC.ai[3] < 0)
+                    NPC.HitEffect(0, 10.0);
+                NPC.checkDead();
+                return;
+            }
+            if (Main.npc[NPC.realLife].ai[1] >= DeathAnimation1)
+            {
+                NPC hd = Main.npc[NPC.realLife];
+                if (NPC.ai[3] > 0)
+                {
+                    NPC.ai[3]--;
+                    //viberation
+                    SetViberation();
+
+                    if (NPC.ai[3] == 0)
+                    {
+                        NPC.ai[3] = -1;
+                        NPC.life = 0;
+                        NPC.HitEffect(0, 10.0);
+                        NPC.checkDead();
+                    }
+                }
                 return;
             }
             if (NPC.target < 0 || NPC.target == 255 || Main.player[NPC.target].dead)
@@ -77,40 +96,43 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             Player player = Main.player[NPC.target];
             NPC previousSegment = Main.npc[(int)NPC.ai[1]];
             NPC head = Main.npc[NPC.realLife];
-            if (head.ai[1] >= 0 && (head.ModNPC as SkyDestroyerHead).CurrentModule.ID > 1)
-            {
-                Music = Mod.GetSoundSlot(SoundType.Music, "Sounds/Music/BuryTheLight1");
-            }
             if (head.ai[1] == -1)
             {
                 ShowupAI();
             }
-            else if (head.ai[1] == SpaceWarp || head.ai[1] == WarpMove || head.ai[1] == PlasmaWarpBlast || head.ai[1] == AntimatterBomb)
-            {
-                WarpAI();
-            }
             else
             {
-                NormalSegmentAI(previousSegment);
-
-                if (head.ai[1] == FireballBarrage)
+                if (WarpState == 0)
                 {
-                    if (NPC.localAI[0] > 0)
+                    NPC prevSegment = Main.npc[(int)NPC.ai[1]];
+                    if (prevSegment.localAI[2] != 1 && prevSegment.localAI[3] != WarpMark)
                     {
-                        NPC.localAI[0]--;
-                        if (NPC.localAI[0] <= 0 && Main.netMode != NetmodeID.MultiplayerClient)
-                        {
-                            NPC.localAI[0] = 0;
-                            if (NPC.ai[3] == 0)
-                                Projectile.NewProjectile(NPC.GetProjectileSource(), NPC.Center, Vector2.UnitY * 10, ModContent.ProjectileType<SkyFireballLauncher>(),
-                                    NPC.damage * 2 / 3, 0f, Main.myPlayer, NPC.target, 0);
-                            else if (NPC.ai[3] == 1)
-                                Projectile.NewProjectile(NPC.GetProjectileSource(), NPC.Center, -Vector2.UnitY * 10, ModContent.ProjectileType<SkyFireballLauncher>(),
-                                    NPC.damage * 2 / 3, 0f, Main.myPlayer, NPC.target, 3);
-                        }
+                        WarpMark = (int)prevSegment.localAI[3];
+                        WarpState = 1;
                     }
                 }
+
+                if (Util.CheckProjAlive(WarpMark))
+                {
+                    if (Util.CheckProjAlive<SkyWarpMarkEx>(WarpMark))
+                    {
+                        WarpAIEx();
+                    }
+                    else
+                    {
+                        WarpAI();
+                    }
+                }
+                else
+                {
+                    WarpAI();
+                }
             }
+            //if (npc.Center.HasNaNs() || float.IsInfinity(npc.Center.X) || float.IsInfinity(npc.Center.Y)) System.Diagnostics.Debugger.Break();
+        }
+        public override bool CanHitPlayer(Player target, ref int cooldownSlot)
+        {
+            return CanHitPlayer(target, ref cooldownSlot);
         }
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
         {
@@ -120,28 +142,30 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         {
             return false;
         }
-        public override bool PreDraw(SpriteBatch spriteBatch,Vector2 screenPos , Color drawColor)
+        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             //Mod mod = ModLoader.GetMod("TeaNPC");
-            Texture2D texture = Terraria.GameContent.TextureAssets.Npc[NPC.type].Value;
-            Texture2D texture2D = Terraria.GameContent.TextureAssets.Npc[NPC.type].Value;
-            texture = Terraria.GameContent.TextureAssets.Npc[NPC.type].Value;
-            texture2D = Mod.Assets.Request<Texture2D>("Glow/NPCs/SkyDestroyerBodyAltGlow").Value;
+            Texture2D texture = TextureAssets.Npc[NPC.type].Value;
+            Texture2D texture2D = TextureAssets.Npc[NPC.type].Value;
+            texture = TextureAssets.Npc[NPC.type].Value;
+            texture2D = Mod.RequestTexture("Glow/NPCs/SkyDestroyerBodyAltGlow");
             Color glowColor = NPC.GetAlpha(Color.White);
-            SpriteEffects effects = (base.NPC.direction < 0) ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+            SpriteEffects effects = (NPC.direction < 0) ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
             var mainColor = NPC.GetAlpha(drawColor);
-            spriteBatch.Draw(texture, NPC.Center - screenPos + new Vector2(0f, NPC.gfxOffY), new Rectangle?(NPC.frame), mainColor * NPC.Opacity, NPC.rotation + MathHelper.Pi / 2, NPC.frame.Size() / 2f, NPC.scale, effects, 0f);
-            spriteBatch.Draw(texture2D, NPC.Center - screenPos + new Vector2(0f, NPC.gfxOffY), new Rectangle?(NPC.frame), glowColor * 0.75f * NPC.Opacity, NPC.rotation + MathHelper.Pi / 2, NPC.frame.Size() / 2f, NPC.scale, effects, 0f);
+            spriteBatch.Draw(texture, GetDrawPosition(screenPos), new Rectangle?(NPC.frame), mainColor * NPC.Opacity, NPC.rotation + MathHelper.Pi / 2, NPC.frame.Size() / 2f, NPC.scale, effects, 0f);
+            spriteBatch.Draw(texture2D, GetDrawPosition(screenPos), new Rectangle?(NPC.frame), glowColor * 0.75f * NPC.Opacity, NPC.rotation + MathHelper.Pi / 2, NPC.frame.Size() / 2f, NPC.scale, effects, 0f);
             return false;
         }
         public override void HitEffect(int hitDirection, double damage)
         {
-            if (NPC.life <= 0)
+            for (int i = 0; i < 5; i++)
             {
-                Gore.NewGore(NPC.position, NPC.velocity, ModContent.Find<ModGore>("Gores/Martians/SkydestroyerbodyAltGore").Type, 1f);
+                Dust.NewDust(NPC.position, NPC.width, NPC.height, MyDustId.CyanShortFx1, (float)hitDirection, -1f, 0, default(Color), 1f);
             }
             if (NPC.life <= 0)
             {
+                BodyPreventDeath();
+                Gore.NewGore(NPC.position, NPC.velocity, Mod.GetGoreType("Gores/Martians/SkydestroyerbodyAltGore"), 1f);
                 for (int i = 0; i < 20; i++)
                 {
                     int num = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, MyDustId.CyanShortFx1, 0f, 0f, 100, default(Color), 2f);
