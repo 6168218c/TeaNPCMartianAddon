@@ -172,7 +172,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
             NPC head = Main.npc[(int)Projectile.ai[0]];
             Player player = Main.player[head.target];
             //Player player = Main.player[0];
-            Projectile.Center = player.Center;
+            Projectile.Center = player.Center + player.velocity;
             if (globalTimer == 0 && Main.netMode != NetmodeID.MultiplayerClient)
             {
                 Projectile.direction = Main.rand.NextBool() ? -1 : 1;
@@ -283,7 +283,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
             {
                 Projectile.localAI[0]++;
                 Vector2 offset = parent.rotation.ToRotationVector2().RotatedBy(MathHelper.TwoPi / parent.localAI[1] * Projectile.ai[1])
-                    * (250 + (float)Math.Sin(Projectile.localAI[0] * Math.PI / 30) * 200);
+                    * (550 + (float)Math.Sin(Projectile.localAI[0] * Math.PI / 120) * 100);
                 Vector2 dest = parent.Center + offset;
                 if (Projectile.DistanceSQ(dest) > 60 * 60)
                 {

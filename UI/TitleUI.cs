@@ -45,7 +45,7 @@ namespace TeaNPCMartianAddon.UI
         {
             if (!IsVisible) return;
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix * Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
             float opacity = 1;
             if (timer <= fadeTime) opacity = (float)timer / fadeTime;
             else if (timer >= maxTime-fadeTime && timer < maxTime) opacity = (float)(maxTime - timer) / fadeTime;
@@ -54,9 +54,9 @@ namespace TeaNPCMartianAddon.UI
             var font = Terraria.GameContent.FontAssets.DeathText.Value;
             var text = quote;
             Vector2 offset = font.MeasureString(text);
-            spriteBatch.DrawString(font, text, position - offset / 2, Color.Turquoise);
+            spriteBatch.DrawString(font, text, position*Main.GameViewMatrix.Zoom - offset / 2, Color.Turquoise);
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix * Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
             base.Draw(spriteBatch);
         }
     }

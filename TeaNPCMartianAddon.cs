@@ -44,6 +44,8 @@ namespace TeaNPCMartianAddon
                 Filters.Scene["TeaNPCAddon:RectBlackout"].Load();
                 Filters.Scene["TeaNPCAddon:CircularBlackout"] = new Filter(new FadeScreenShader(blackoutRef, "CircularBlackout"), EffectPriority.VeryHigh);
                 Filters.Scene["TeaNPCAddon:CircularBlackout"].Load();
+
+                SkyManager.Instance[$"{nameof(TeaNPCMartianAddon)}:SDEXSky"] = new Skies.SDEXSky();
             }
             Instance = this;
         }

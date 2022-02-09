@@ -12,6 +12,7 @@ using Terraria.Localization;
 using TeaNPCMartianAddon.Items.Bosses.Martians;
 using TeaNPCMartianAddon.Projectiles.Boss;
 using TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer;
+using Terraria.Graphics.Effects;
 
 namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
 {
@@ -21,6 +22,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         #region Fields
         private bool spawned;
         private bool Dead = false;
+        private bool lastPhase = false;
         Vector2 centerVector;
         public float DynDR;
         public int DynDRTimer;
@@ -90,7 +92,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         {
             new ModulePhase(1,LightningStorm,Plasmerizer,1,"Mods.TeaNPCMartianAddon.NPCChat.SDEX1"),
             new ModulePhase(2,new int[]{ WarpMove,Plasmerizer,PlasmaWarpBlast,FireballBarrage,LightningStorm },0.85f,"Mods.TeaNPCMartianAddon.NPCChat.SDEX2"),
-            new ModulePhase(3,new int[]{ SpaceWarp,PlasmaWarpBlast,WarpMove,Plasmerizer,LightningStormEx,PlasmaWarpBlast },0.45f,"Mods.TeaNPCMartianAddon.NPCChat.SDEX3")
+            new ModulePhase(3,new int[]{ SpaceWarp,WormBarrage,PlasmaWarpBlast,WarpMove,Plasmerizer,LightningStormEx,PlasmaWarpBlast },0.45f,"Mods.TeaNPCMartianAddon.NPCChat.SDEX3")
         };
         private int _currModuleIndex = -1;
         internal ModulePhase CurrentModule => Modules[_currModuleIndex];
@@ -101,7 +103,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 if (NPC.life <= Modules[_currModuleIndex + 1].MaxLifeLimit * NPC.lifeMax)
                 {
                     _currModuleIndex++;
-                    SDMessage(Language.GetTextValue(CurrentModule.EnterQuoteID));
+                    SDMessage(Language.GetText(CurrentModule.EnterQuoteID).Value);
                 }
             }
         }
@@ -135,7 +137,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             base.NPC.height = 150;
             base.NPC.defense = 45;
             this.Music = MusicLoader.GetMusicSlot($"{nameof(TeaNPCMartianAddon)}/Sounds/Music/BuryTheLight");
-            base.NPC.lifeMax = 590000;
+            base.NPC.lifeMax = baseMaxLife;
             base.NPC.aiStyle = -1;
             this.AnimationType = 10;
             base.NPC.knockBackResist = 0f;
@@ -165,6 +167,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             writer.Write(centerVector.Y);
             writer.Write(extraAI[0]);
             writer.Write(extraAI[1]);
+            writer.Write(lastPhase);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -176,6 +179,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             centerVector.Y = reader.ReadSingle();
             extraAI[0] = reader.ReadSingle();
             extraAI[1] = reader.ReadSingle();
+            lastPhase = reader.ReadBoolean();
         }
         public override void AI()
         {
@@ -316,6 +320,8 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             {
                 if (NPC.ai[2] == 0)
                 {
+                    if(!Main.dedServ)
+                        SkyManager.Instance.Activate($"{nameof(TeaNPCMartianAddon)}:SDEXSky");
                     ResetWarpStates();
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
@@ -402,9 +408,10 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                     Util.KillAll<SkyPlasmaBallChainHead>(true);
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
+                        Vector2 start = NPC.Center + NPC.velocity * 20;
                         Vector2 target = player.Center + Main.rand.NextVector2Unit() * 600;
-                        WarpMark = NPC.NewProjectile(NPC.Center + NPC.velocity * 20, Vector2.Zero, ModContent.ProjectileType<SkyWarpMark>(),
-                            0, 0f, Main.myPlayer, target.X, target.Y);
+                        WarpMark = NPC.NewProjectile(target, Vector2.Zero, ModContent.ProjectileType<SkyWarpMark>(),
+                            0, 0f, Main.myPlayer, start.X, start.Y);
                         WarpState = 1;
                     }
                 }
@@ -500,9 +507,17 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             {
                 LightningStormExAI(player, maxSpeed, turnAcc, ramAcc);
             }
-            else if (NPC.ai[1] == FireballBarrageEx)
+            else if (NPC.ai[1] == WormBarrage)
             {
-                FireballBarrageExAI(player, maxSpeed, turnAcc, ramAcc);
+                if (lastPhase)
+                {
+                    AntimatterBombAI(player, maxSpeed, turnAcc, ramAcc);
+                }
+                else
+                {
+                    WormBarrageAI(player, maxSpeed, turnAcc, ramAcc);
+                }
+                
             }
             else if (NPC.ai[1] == ResetStates)
             {
@@ -515,7 +530,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             }
             else if (NPC.ai[1] == DeathAnimation0)
             {
-                SwitchTo(DeathAnimation1);
+                DeathAnimation0AI(player, maxSpeed, turnAcc, ramAcc);
             }
             else if (NPC.ai[1] == DeathAnimation1)
             {
@@ -537,7 +552,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                             counter++;
                             NPC tmpNPC = Main.npc[i];
                             tmpNPC.ai[3] = currTime - ind;
-                            currTime -= ind;
+                            //currTime -= ind;
                             if (counter >= 40)
                             {
                                 ind++;
@@ -924,13 +939,9 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             {
                 if (NPC.ai[2] >= 180&&!IsWarping())
                 {
-                    for(int i = 0; i < Main.projectile.Length; i++)
-                    {
-                        if (Util.CheckProjAlive<SkyAntimatterBombCenter>(i))
-                        {
-                            Main.projectile[i].Kill();
-                        }
-                    }
+                    Util.KillAll<SkyAntimatterBomb>();
+                    Util.KillAll<SkyAntimatterBombCenter>();
+                    Util.KillAll<SkyMatterMissile>();
                     CurrentModule.SwitchToNext(this);
                 }
             }
@@ -959,7 +970,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 i = (int)Main.npc[i].ai[0];
             }
         }
-        bool IsWarping()
+        bool IsWarping(int value = 0)
         {
             int i = NPC.whoAmI;
             int counter = 0;
@@ -968,7 +979,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             {
                 counter++;
                 NPC tmpNPC = Main.npc[i];
-                if (tmpNPC.localAI[2] != 0)
+                if (tmpNPC.localAI[2] != value)
                 {
                     warping = true;
                 }
@@ -1020,7 +1031,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         #endregion
         void WarpMoveAI(Player player, float maxSpeed, float turnAcc, float ramAcc)
         {
-            int times = 5;
+            int times = 4;
             if (WarpState == 0)
             {
                 if (NPC.ai[3] >= times)
@@ -1052,7 +1063,9 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                     {
                         Projectile mark = Main.projectile[(int)NPC.localAI[0]];
                         mark.Center = NPC.Center + NPC.velocity * 20;
+                        mark.ai[0] = 11;
                         mark.netUpdate = true;
+                        (mark.ModProjectile as SkyWarpMarkEx).ResetExtraAI(0);
                         if (NPC.ai[2] % 360 == 180) mark.ai[0] = 11;
                     }
                     if (NPC.ai[2] % 360 == 180)
@@ -1110,11 +1123,11 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                             NPC.NewProjectile(mark.Center,
                                 Vector2.Zero
                                 , ModContent.ProjectileType<SkyPortalSentry>(),
-                                NPC.damage / 5, 0f, Main.myPlayer, SkyPortalSentry.PackAi0((0, 3)), 18);
+                                NPC.damage / 5, 0f, Main.myPlayer, SkyPortalSentry.PackAi0((0, 3)), 9);
                             NPC.NewProjectile(mark.velocity,
                                 Vector2.Zero
                                 , ModContent.ProjectileType<SkyPortalSentry>(),
-                                NPC.damage / 5, 0f, Main.myPlayer, SkyPortalSentry.PackAi0((0, 3)), 18);
+                                NPC.damage / 5, 0f, Main.myPlayer, SkyPortalSentry.PackAi0((0, 3)), 9);
                         }
                         NPC.Center = mark.velocity;
                         WarpState = 0;
@@ -1424,29 +1437,246 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         }
         void LightningStormExAI(Player player, float maxSpeed, float turnAcc, float ramAcc)
         {
-            NPC.ai[2]++;
-
-            if (NPC.ai[2] <= 120)
+            int times = 4;
+            if (WarpState == 0)
             {
-                NPC.WormMovement(player.Center + player.DirectionTo(NPC.Center) * 900, maxSpeed, turnAcc, ramAcc);
-                if (NPC.ai[2] == 120)
+                if (NPC.ai[3] >= times)
                 {
-
+                    CurrentModule.SwitchToNext(this);
+                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * maxSpeed;
+                }
+                if (NPC.ai[2] % 360 == 0 && Main.netMode != NetmodeID.MultiplayerClient && NPC.ai[3] < times)
+                {
+                    NPC.localAI[0] = NPC.NewProjectile(NPC.Center + NPC.velocity * 20, player.Center + Main.rand.NextVector2Unit() * 1200, ModContent.ProjectileType<SkyWarpMarkEx>(),
+                        0, 0f, Main.myPlayer, 0, 1);
+                }
+                if (NPC.ai[2] % 360 == 0 && !Main.dedServ)
+                {
+                    NPC.localAI[1] = Main.rand.Next(0, 4) * MathHelper.PiOver2;
+                    SkyManager.Instance.Activate($"{nameof(TeaNPCMartianAddon)}:SDEXSky", NPC.Center, NPC.localAI[1], 75);
+                }
+                
+                NPC.ai[2]++;
+                if (NPC.ai[2] % 360 == 60 && NPC.ai[3] < times)
+                {
+                    if (Util.CheckProjAlive<SkyWarpMarkEx>((int)NPC.localAI[0]) && NPC.localAI[0] != WarpMark)
+                    {
+                        Projectile mark = Main.projectile[(int)NPC.localAI[0]];
+                        int length = NPC.ai[3] == 2 ? 900 : 600;
+                        mark.ai[0] = 01;
+                        mark.netUpdate = true;
+                        (mark.ModProjectile as SkyWarpMarkEx).ResetExtraAI(1);
+                        mark.velocity = player.Center + Main.rand.NextVector2Unit() * length;
+                    }
+                }
+                if (NPC.ai[2] % 360 <= 180 && NPC.ai[3] < times)
+                {
+                    if (Util.CheckProjAlive<SkyWarpMarkEx>((int)NPC.localAI[0]) && NPC.localAI[0] != WarpMark)
+                    {
+                        Projectile mark = Main.projectile[(int)NPC.localAI[0]];
+                        mark.Center = NPC.Center + NPC.velocity * 20;
+                        mark.ai[0] = 11;
+                        mark.netUpdate = true;
+                        (mark.ModProjectile as SkyWarpMarkEx).ResetExtraAI(0);
+                        if (NPC.ai[2] % 360 == 180) mark.ai[0] = 11;
+                    }
+                    if (NPC.ai[2] % 360 == 180)
+                    {
+                        WarpMark = (int)NPC.localAI[0];
+                        WarpState = 1;
+                        NPC.netUpdate = true;
+                    }
+                }
+                NPC.WormMovementEx(player.Center, maxSpeed * 1.8f, turnAcc, ramAcc, distLimit: 1800);
+                /*if (npc.ai[3] >= 2 && !IsWarping())
+                {
+                    ResetWarpStates();
+                    Util.KillAll<SkyWarpMarkEx>(true, 2);
+                    Util.KillAll<SkyUFO>(true, 1);
+                    CurrentModule.SwitchToNext(this);
+                    npc.velocity = npc.velocity.SafeNormalize(Vector2.UnitY) * maxSpeed;
+                }*/
+            }
+            else if (WarpState == 1)
+            {
+                if (Util.CheckProjAlive<SkyWarpMarkEx>(WarpMark))
+                {
+                    Projectile mark = Main.projectile[WarpMark];
+                    if (NPC.DistanceSQ(mark.Center) <= warpDistance * warpDistance)
+                    {
+                        WarpState = 2;
+                    }
+                    else
+                    {
+                        NPC.velocity = (mark.Center - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
+                    }
+                }
+                else
+                {
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        WarpMark = FindFirstWarpMark(false);
+                        NPC.WormMovement(player.Center, maxSpeed, turnAcc, ramAcc);
+                    }
                 }
             }
-            else
+            else if (WarpState == 2)
             {
-                
+                NPC.alpha = 255;
+                NPC.ai[2]++;
+                NPC.velocity = Vector2.Zero;
+                if (Util.CheckProjAlive<SkyWarpMarkEx>(WarpMark))
+                {
+                    Projectile mark = Main.projectile[WarpMark];
+                    if (NPC.ai[2] % 360 >= 240)
+                    {
+                        if (Main.netMode != NetmodeID.MultiplayerClient)
+                        {
+                            NPC.NewProjectile(mark.velocity, Vector2.Zero, ModContent.ProjectileType<SkySentryCenter>(),
+                                NPC.damage / 5, 0f, Main.myPlayer, NPC.whoAmI, 1);
+                        }
+                        NPC.Center = mark.velocity;
+                        WarpState = 0;
+                        mark.localAI[1]++;
+                        NPC.ai[3]++;
+                        NPC.velocity = (player.Center - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
+                    }
+                }
+            }
+        }
+        void WormBarrageAI(Player player, float maxSpeed, float turnAcc, float ramAcc)
+        {
+            NPC.ai[2]++;
+            if (NPC.ai[2] <= 240 && NPC.ai[2] % 45 == 0 && Main.netMode != NetmodeID.MultiplayerClient)
+            {
+                NPC.NewProjectile(player.Center + Main.rand.NextVector2CircularEdge(1200, 800), Vector2.Zero,
+                    ModContent.ProjectileType<SkyWarpWorm>(), NPC.damage / 5, 0f, Main.myPlayer, 360, 2);
             }
 
-            if (NPC.ai[2] >= 450)
+            NPC.WormMovement(player.Center, maxSpeed, turnAcc, ramAcc);
+            if (NPC.ai[2] >= 640)
             {
                 CurrentModule.SwitchToNext(this);
             }
         }
-        void FireballBarrageExAI(Player player, float maxSpeed, float turnAcc, float ramAcc)
+        void DeathAnimation0AI(Player player,float maxSpeed,float turnAcc,float ramAcc)
         {
-
+            if (NPC.ai[2] == 0)
+            {
+                NPC.ai[2]++;
+                Util.KillAll<SkyPlasmaArena>();
+                Util.KillAll<SkyFireball>(true, 1);
+                Util.KillAll<SkyPlasmerizerExplosion>(true, 1);
+                Util.KillAll<SkyLightningOrbCenter>();
+                Util.KillAll<SkyUFO>(true, 1);
+                Util.KillAll<SkyPlasmaBallChainHead>(true);
+                WarpMark = NPC.NewProjectile(NPC.Center + NPC.velocity * 20, player.Center + Main.rand.NextVector2Unit() * 200, ModContent.ProjectileType<SkyWarpMarkEx>(),
+                        0, 0f, Main.myPlayer, 10, 0);
+                WarpState = 1;
+                NPC.netUpdate = true;
+            }
+            if (WarpState == 1)
+            {
+                if (Util.CheckProjAlive<SkyWarpMarkEx>(WarpMark))
+                {
+                    Projectile mark = Main.projectile[WarpMark];
+                    if (NPC.DistanceSQ(mark.Center) <= warpDistance * warpDistance)
+                    {
+                        WarpState = 2;
+                    }
+                    else
+                    {
+                        NPC.velocity = (mark.Center - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
+                    }
+                }
+                else
+                {
+                    System.Diagnostics.Debugger.Break();
+                }
+            }
+            else if (WarpState == 2)
+            {
+                NPC.alpha = 255;
+                NPC.velocity = Vector2.Zero;
+                if (Util.CheckProjAlive<SkyWarpMarkEx>(WarpMark))
+                {
+                    Projectile mark = Main.projectile[WarpMark];
+                    if (!IsWarping(2))
+                    {
+                        if (NPC.ai[2] == 1)
+                        {
+                            mark.ai[0] = 11;
+                            mark.netUpdate = true;
+                            (mark.ModProjectile as SkyWarpMarkEx).ResetExtraAI(1);
+                            Util.KillAll<SkyWarpMark>(true, 2);
+                            for (int i = 0; i < Main.maxProjectiles; i++)
+                            {
+                                if (i != WarpMark && Util.CheckProjAlive<SkyWarpMarkEx>(i))
+                                {
+                                    Main.projectile[i].Kill();
+                                }
+                            }
+                        }
+                        if (NPC.ai[2] <= 180 && Main.netMode != NetmodeID.MultiplayerClient)
+                        {
+                            if (NPC.ai[2] % 20 == 0)
+                            {
+                                NPC.NewProjectile(Main.npc[closestSegment].Center + Main.rand.NextVector2Circular(800, 600), Vector2.Zero, ModContent.ProjectileType<SkyWarpWorm>(),
+                                    NPC.damage / 5, 0f, Main.myPlayer, 0, 3);
+                            }
+                        }
+                        NPC.ai[2]++;
+                        NPC.velocity *= 0.95f;
+                        NPC.WormMovement(player.Center, NPC.velocity.Length());
+                        if (NPC.ai[2] >= 600 && NPC.ai[2] <= 750)
+                        {
+                            if (NPC.ai[2] == 600) Util.KillAll<SkyWarpWorm>();
+                            if (NPC.ai[2] >= 660)
+                            {
+                                for (int i = 0; i < Main.maxGore; i++)
+                                {
+                                    if (Main.gore[i].active &&
+                                        (Main.gore[i].type == Mod.GetGoreType(SkyWarpWorm.HeadGore)
+                                        || Main.gore[i].type == Mod.GetGoreType(SkyWarpWorm.BodyAltGore)
+                                        || Main.gore[i].type == Mod.GetGoreType(SkyWarpWorm.BodyGore)
+                                        || Main.gore[i].type == Mod.GetGoreType(SkyWarpWorm.TailGore)))
+                                    {
+                                        Main.gore[i].timeLeft = 60;
+                                        if (NPC.DistanceSQ(Main.gore[i].position) < 150 * 150)
+                                        {
+                                            Main.gore[i].active = false;
+                                        }
+                                        Main.gore[i].velocity = (NPC.Center - Main.gore[i].position) / 60;
+                                    }
+                                }
+                            }
+                        }
+                        if (NPC.ai[2] > 750)
+                        {
+                            NPC.life = (int)(NPC.lifeMax * 0.15f);
+                            lastPhase = true;
+                            int i = NPC.whoAmI;
+                            int counter = 0;
+                            while (i != -1)
+                            {
+                                counter++;
+                                NPC tmpNPC = Main.npc[i];
+                                tmpNPC.dontTakeDamage = false;
+                                i = (int)Main.npc[i].ai[0];
+                            }
+                            NPC.Center = mark.velocity;
+                            WarpState = 0;
+                            mark.localAI[1]++;
+                            NPC.velocity = (player.Center - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
+                            CurrentModule.SwitchToNext(this);
+                        }
+                    }
+                }
+            }
+            else if (WarpState == 0)
+            {
+                
+            }
         }
         public override void PostAI()
         {
@@ -1574,7 +1804,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         }
         public override bool CheckDead()
         {
-            if (NPC.ai[1] < DeathAnimation0)
+            if (!lastPhase)
             {
                 NPC.life = 1;
                 NPC.ai[1] = DeathAnimation0;
@@ -1589,12 +1819,22 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 }
                 return false;
             }
+            else if (NPC.ai[1] < DeathAnimation1)
+            {
+                NPC.life = 1;
+                NPC.ai[1] = DeathAnimation1;
+                int i = NPC.whoAmI;
+                int counter = 0;
+                while (i != -1)
+                {
+                    counter++;
+                    NPC tmpNPC = Main.npc[i];
+                    tmpNPC.dontTakeDamage = true;
+                    i = (int)Main.npc[i].ai[0];
+                }
+                return false;
+            }
             return true;
-        }
-        public override void ScaleExpertStats(int numPlayers, float bossLifeScale)
-        {
-            base.NPC.lifeMax = (int)((float)base.NPC.lifeMax * 0.8f * bossLifeScale);
-            base.NPC.damage = (int)((float)base.NPC.damage * 0.675f);
         }
         
         public void SDMessage(string message)
@@ -1606,7 +1846,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             var maxSpeed = 18f;
             if (Main.expertMode)
                 maxSpeed *= 1.125f;
-            if (NPC.ai[1] == WarpMove)
+            if (NPC.ai[1] == WarpMove || NPC.ai[1]==LightningStormEx ||NPC.ai[1] == DeathAnimation0)
                 maxSpeed *= 1.8f;
             return maxSpeed;
         }

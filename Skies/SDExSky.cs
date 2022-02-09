@@ -19,7 +19,7 @@ namespace TeaNPCMartianAddon.Skies
 {
     public class SDEXSky:CustomSky
     {
-		private float direction;
+		private float rotation;
 		private int timer;
 		private int timeMax;
 		private bool _isActive;
@@ -37,6 +37,10 @@ namespace TeaNPCMartianAddon.Skies
 			{
 				timer = timeMax;
 			}
+            if (!UpdateSDEXIndex())
+            {
+				this.Deactivate();
+            }
 		}
 
 		private float GetIntensity()
@@ -92,7 +96,7 @@ namespace TeaNPCMartianAddon.Skies
 					float prog = 1 - (float)timer / timeMax;
 					for(int i = -1; i <= 1; i++)
                     {
-						DrawArrow(new Vector2(Main.screenWidth, Main.screenHeight) + i * direction.ToRotationVector2() * 360f,
+						DrawArrow(new Vector2(Main.screenWidth, Main.screenHeight)/2 + i * rotation.ToRotationVector2() * 180f,
 							MathHelper.Clamp(prog - i * 0.3f, 0, 1));
                     }
                 }
@@ -119,14 +123,16 @@ namespace TeaNPCMartianAddon.Skies
 
 			float rectWidth = height + arrowWidth;
 			float rectHeight = height * 2;
+			Vector2 unitX = Vector2.UnitX.RotatedBy(rotation);
+			Vector2 unitY = Vector2.UnitY.RotatedBy(rotation);
 
 			List<VertexStripInfo> vertecies = new List<VertexStripInfo>();
-			vertecies.Add(new VertexStripInfo(center - new Vector2(rectWidth / 2, rectHeight), Color.White, new Vector3(0.5f, 0.5f, 1)));
-			vertecies.Add(new VertexStripInfo(center - new Vector2(rectWidth / 2-arrowWidth, rectHeight), Color.White, new Vector3(0.5f, 0.5f, 1)));
-			vertecies.Add(new VertexStripInfo(center + new Vector2(rectWidth / 2 - arrowWidth, 0), Color.White, new Vector3(0.5f, 0.5f, 1)));
-			vertecies.Add(new VertexStripInfo(center + new Vector2(rectWidth / 2, 0), Color.White, new Vector3(0.5f, 0.5f, 1)));
-			vertecies.Add(new VertexStripInfo(center - new Vector2(rectWidth / 2, -rectHeight), Color.White, new Vector3(0.5f, 0.5f, 1)));
-			vertecies.Add(new VertexStripInfo(center - new Vector2(rectWidth / 2 - arrowWidth, -rectHeight), Color.White, new Vector3(0.5f, 0.5f, 1)));
+			vertecies.Add(new VertexStripInfo(center - (unitX*rectWidth / 2+unitY* rectHeight), Color.White, new Vector3(0.5f, 0.5f, 1)));
+			vertecies.Add(new VertexStripInfo(center - (unitX*(rectWidth / 2 - arrowWidth)+unitY*rectHeight), Color.White, new Vector3(0.5f, 0.5f, 1)));
+			vertecies.Add(new VertexStripInfo(center + (unitX*(rectWidth / 2 - arrowWidth)+unitY*0), Color.White, new Vector3(0.5f, 0.5f, 1)));
+			vertecies.Add(new VertexStripInfo(center + (unitX*rectWidth / 2+unitY*0), Color.White, new Vector3(0.5f, 0.5f, 1)));
+			vertecies.Add(new VertexStripInfo(center - (unitX*rectWidth / 2+unitY*-rectHeight), Color.White, new Vector3(0.5f, 0.5f, 1)));
+			vertecies.Add(new VertexStripInfo(center - (unitX*(rectWidth / 2 - arrowWidth)+unitY*-rectHeight), Color.White, new Vector3(0.5f, 0.5f, 1)));
 
 			var projection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, 0, 1);
 			var model = Matrix.CreateTranslation(new Vector3()) * Main.GameViewMatrix.TransformationMatrix;
@@ -155,7 +161,7 @@ namespace TeaNPCMartianAddon.Skies
 			this._isActive = true;
 			if (args.Count() == 2 && args[0] is float dir && args[1] is int maxTime)
             {
-				direction = dir;
+				rotation = dir;
 				timer = maxTime;
 				timeMax = maxTime;
             }
@@ -166,7 +172,7 @@ namespace TeaNPCMartianAddon.Skies
 			this._isActive = false;
 			if (args.Count() == 2 && args[0] is float dir && args[1] is int maxTime)
 			{
-				direction = dir;
+				rotation = dir;
 				timer = maxTime;
 				timeMax = maxTime;
 			}

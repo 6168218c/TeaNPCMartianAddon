@@ -56,7 +56,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 					Projectile.HoverMovementEx(player.Center, 15f, 0.45f);
 				
 				Projectile.rotation = Projectile.rotation + 0.015f * MathHelper.SmoothStep(0, 1, Projectile.localAI[0] / 360) * Projectile.direction;
-				if (Projectile.localAI[0] >= 360)
+				if (Projectile.localAI[0] >= 360 || (Projectile.localAI[0] >= 45 && Projectile.ai[1] == 1))
 				{
 					Projectile.Kill();
 				}
@@ -127,12 +127,12 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 					{
 						if (para.count == 1)
 						{
-							base.Projectile.NewProjectile(Projectile.Center, velo.RotatedBy(Math.PI / 6)* Projectile.ai[1], ProjectileID.CultistBossLightningOrbArc, Projectile.damage,
+							base.Projectile.NewProjectile(Projectile.Center, velo.RotatedBy(Math.PI / 6)* Projectile.ai[1], ProjectileID.VortexLightning, Projectile.damage,
 								0f, Main.myPlayer, velo.RotatedBy(Math.PI / 6).ToRotation());
 						}
 						else
 						{
-							base.Projectile.NewProjectile(Projectile.Center, velo* Projectile.ai[1], ProjectileID.CultistBossLightningOrbArc, Projectile.damage,
+							base.Projectile.NewProjectile(Projectile.Center, velo* Projectile.ai[1], ProjectileID.VortexLightning, Projectile.damage,
 								0f, Main.myPlayer, velo.ToRotation());
 							velo = velo.RotatedBy(Math.PI / 3 / (para.count - 1));
 						}
@@ -196,12 +196,32 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                     if (parent.ai[1] == 0)
                     {
 						extraAI[0]++;
-                        if (extraAI[0] % 30 == 0&&Main.netMode!=NetmodeID.MultiplayerClient)
-                        {
-							base.Projectile.NewProjectile(Projectile.Center, Projectile.DirectionFrom(parentCenter) * 8f, ModContent.ProjectileType<SkyPlasmaAcclerator>() ,
-                                Projectile.damage, 0f, Main.myPlayer);
+						if (extraAI[0] % 60 == 0 && Main.netMode != NetmodeID.MultiplayerClient)
+						{
+							base.Projectile.NewProjectile(Projectile.Center, Projectile.DirectionFrom(parentCenter) * 8f, ModContent.ProjectileType<SkyPlasmaAcclerator>(),
+								Projectile.damage, 0f, Main.myPlayer);
 						}
-                    }
+					}
+                    else if (parent.ai[1] == 1)
+                    {
+						int temp = Player.FindClosest(Projectile.position, Projectile.width, Projectile.height);
+						if (temp < 0 || temp == 255)
+						{
+							return;
+						}
+						Player player = Main.player[temp];
+						extraAI[0]++;
+						if (extraAI[0] % 60 == 0 && Main.netMode != NetmodeID.MultiplayerClient && para.count % 2 == 0)
+						{
+							base.Projectile.NewProjectile(Projectile.Center, Projectile.DirectionFrom(player.Center) * 8f, ModContent.ProjectileType<SkyPlasmaAcclerator>(),
+								Projectile.damage, 0f, Main.myPlayer);
+						}
+						else if ((extraAI[0] + 30) % 60 == 0 && Main.netMode != NetmodeID.MultiplayerClient && para.count % 2 == 1)
+						{
+							base.Projectile.NewProjectile(Projectile.Center, Projectile.DirectionFrom(player.Center) * 8f, ProjectileID.VortexLightning,
+								Projectile.damage, 0f, Main.myPlayer, Projectile.DirectionFrom(parentCenter).ToRotation());
+						}
+					}
                 }
                 else
                 {
@@ -229,12 +249,8 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 					}
 					else if (parentMode == 1)
                     {
-						Projectile.HoverMovement(parentCenter, 12f, 0.2f);
-                        if (Projectile.DistanceSQ(parentCenter) <= 30 * 30)
-                        {
-
-                        }
-                    }
+						Projectile.localAI[0] = Math.Max(Projectile.localAI[0], 81);
+					}
                 }
             }
 
@@ -440,6 +456,36 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 						{
 							Vector2 unit = Projectile.rotation.ToRotationVector2().RotatedBy(MathHelper.Pi / 2 * i);
 							Projectile.DrawAim(spriteBatch, Projectile.Center + unit * 1800, alpha);
+						}
+					}
+				}
+				else if (parentMode == 1)
+                {
+					int temp = Player.FindClosest(Projectile.position, Projectile.width, Projectile.height);
+					if (temp < 0 || temp == 255)
+					{
+						return false;
+					}
+					Player player = Main.player[temp];
+					float timer = extraAI[0];
+                    if (UnpackAi0((int)Projectile.ai[0]).count % 2 == 0)
+                    {
+						if (timer >= 0 && timer <= 45)
+						{
+							Color alpha = Color.Turquoise;
+							if (timer <= 10) alpha *= timer / 10;
+							else if (timer >= 30) alpha *= (45 - timer) / 25;
+							Projectile.DrawAim(spriteBatch, Projectile.Center + (player.Center - Projectile.Center).SafeNormalize(Vector2.Zero) * 1800, alpha);
+						}
+					}
+					else if (UnpackAi0((int)Projectile.ai[0]).count % 2 == 1)
+                    {
+						if (timer >= 0 && timer <= 45)
+						{
+							Color alpha = Color.Turquoise;
+							if (timer <= 10) alpha *= timer / 10;
+							else if (timer >= 30) alpha *= (45 - timer) / 25;
+							Projectile.DrawAim(spriteBatch, Projectile.Center + (player.Center-Projectile.Center).SafeNormalize(Vector2.Zero) * 1800, alpha);
 						}
 					}
 				}

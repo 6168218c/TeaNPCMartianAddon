@@ -1,0 +1,20 @@
+Mods:{
+    TeaNPCMartianAddon:{
+        NPCName:{
+            SkyDestroyerHead:The Sky Colossus
+            SkyDestroyerBody:"{$Mods.TeaNPCMartianAddon.NPCName.SkyDestroyerHead}"
+            SkyDestroyerBodyAlt:"{$Mods.TeaNPCMartianAddon.NPCName.SkyDestroyerHead}"
+            SkyDestroyerTail:"{$Mods.TeaNPCMartianAddon.NPCName.SkyDestroyerHead}"
+        }
+        NPCChat:{
+            SD1:OBJECT COMPLETED, TARGET IS SCRAPPED.
+            SDEX0:TARGET LOCKED. TRANSPORTING ROUTINE INITIATED.
+            SDEX1:BATTLE MODE ON. PLASMA WEAPON ARMED.
+            SDEX2:WARNING! WARP MODULE INITIALIZED!
+            SDEX3:WARNING! SEVERE BODY DAMAGE DETECTED! FINAL DIRECTIVE ACTIVATED!
+        }
+        Bestiary:{
+            SkyDestroyer:A tremendous sci-fi war machine built on the Sky Destroyer, equipped with most advanced weapons. 
+        }
+    }
+}

@@ -22,7 +22,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             NPC.height = 150;
             NPC.defense = 40;
             this.Music = MusicLoader.GetMusicSlot($"{nameof(TeaNPCMartianAddon)}/Sounds/Music/BuryTheLight");
-            NPC.lifeMax = 650000;
+            NPC.lifeMax = baseMaxLife;
             NPC.aiStyle = -1;
             this.AnimationType = 10;
             NPC.knockBackResist = 0f;

@@ -23,11 +23,15 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
     {
         static readonly string _texPrefix = "NPCs/Bosses/SkyDestroyer/SkySearcher";
         static readonly string _glowPrefix = "Glow/NPCs/SkySearcher";
-        static readonly string _gorePrefix = "Gores/Martians/SDminion";
+        static readonly string _gorePrefix = "SDminion";
         public static string HeadTex => _texPrefix + "Head";
         public static string BodyTex => _texPrefix + "Body";
         public static string BodyAltTex => _texPrefix + "BodyAlt";
         public static string TailTex => _texPrefix + "Tail";
+        public static string HeadGore => _gorePrefix + "HeadGore";
+        public static string BodyGore => _gorePrefix + "BodyGore";
+        public static string BodyAltGore => _gorePrefix + "BodyAltGore";
+        public static string TailGore => _gorePrefix + "TailGore";
         public override string Texture => MigrationUtils.ProjTexturePrefix + ProjectileID.VortexVortexPortal;
         enum SegmentType
         {
@@ -251,6 +255,15 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                 segments[0].alpha = 0;
                 segments[0].state = 1;
             }
+            if (segments[0].state == 1 && Projectile.ai[1] == 0)
+            {
+                Projectile.velocity = (portals[1] - Projectile.Center).SafeNormalize(Vector2.UnitX) * 18f;
+                if(Vector2.Distance(segments[0].Center, portals[1]) < 20)
+                {
+                    segments[0].alpha = 255;
+                    segments[0].state = 2;
+                }
+            }
             if (Projectile.ai[1] == 1)
             {
                 if (Util.CheckNPCAlive<SkyDestroyerHead>((int)Projectile.ai[0]))
@@ -281,10 +294,15 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                     portals[1] = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.UnitY) * 100;
                     Projectile.velocity = Projectile.velocity.SafeNormalize(Vector2.UnitY) * 12;
                 }
+                if (Projectile.localAI[0] % 5 == 0 && Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    Projectile.NewProjectile(Projectile.Center, Projectile.velocity.SafeNormalize(Vector2.Zero) * 9,
+                        ModContent.ProjectileType<SkyFireThrower>(), Projectile.damage / 2, 0f, Main.myPlayer);
+                }
                 int player = Player.FindClosest(segments[0].position, segments[0].width, segments[0].height);
                 if (player != -1)
                 {
-                    Projectile.WormMovement(Main.player[player].Center, 18f);
+                    Projectile.WormMovement(Main.player[player].Center, 13.5f);
                 }
             }
             else if (Projectile.ai[1] == 3)
@@ -323,15 +341,19 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                         segments[i].Center += offset;//handle position first
                     }
                 }
-                else if (Projectile.ai[1] < 2 && prevSegment.state == 2 && segments[i].state != 2)
+                else if (Projectile.ai[1] < 3 && prevSegment.state == 2 && segments[i].state != 2)
                 {
                     float dist = Vector2.Distance(segments[i].Center, portals[1]);
-                    dist = Math.Min(dist - Projectile.velocity.Length(), 0);
+                    dist = Math.Max(dist - 9f, 0);
                     segments[i].Center = portals[1] + (segments[i].Center - portals[1]).SafeNormalize(Vector2.Zero) * dist;
                     if (dist < 20)
                     {
                         segments[i].alpha = 255;
-                        segments[2].state = 2;
+                        segments[i].state = 2;
+                        if (i == segments.Count - 1)
+                        {
+                            Projectile.Kill();
+                        }
                     }
                 }
                 else
@@ -449,8 +471,8 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
             Vector2 origin2 = rectangle.Size() / 2f;
             Main.spriteBatch.Draw(texture2D13, portals[0] - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Color.Black * GetOpacity(0), -rotation[0], origin2, scale[0] * 1.25f, SpriteEffects.FlipHorizontally, 0f);
 			Main.spriteBatch.Draw(texture2D13, portals[0] - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Color.White * GetOpacity(0), rotation[0], origin2, scale[0], SpriteEffects.None, 0f);
-			Main.spriteBatch.Draw(texture2D13, portals[1] - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Color.Black * GetOpacity(0), -rotation[1], origin2, scale[1] * 1.25f, SpriteEffects.FlipHorizontally, 0f);
-			Main.spriteBatch.Draw(texture2D13, portals[1] - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Color.White * GetOpacity(0), rotation[1], origin2, scale[1], SpriteEffects.None, 0f);
+			Main.spriteBatch.Draw(texture2D13, portals[1] - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Color.Black * GetOpacity(1), -rotation[1], origin2, scale[1] * 1.25f, SpriteEffects.FlipHorizontally, 0f);
+			Main.spriteBatch.Draw(texture2D13, portals[1] - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Color.White * GetOpacity(1), rotation[1], origin2, scale[1], SpriteEffects.None, 0f);
             return false;
         }
     }

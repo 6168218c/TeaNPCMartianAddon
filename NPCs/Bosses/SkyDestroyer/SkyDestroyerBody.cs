@@ -26,7 +26,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             NPC.height = 150;
             NPC.defense = 150;
             this.Music = MusicLoader.GetMusicSlot($"{nameof(TeaNPCMartianAddon)}/Sounds/Music/BuryTheLight");
-            NPC.lifeMax = 650000;
+            NPC.lifeMax = baseMaxLife;
             NPC.aiStyle = -1;
             this.AnimationType = 10;
             NPC.knockBackResist = 0f;
@@ -57,7 +57,11 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 NPC.checkDead();
                 return;
             }
-            if (Main.npc[NPC.realLife].ai[1] >= DeathAnimation1)
+            if (Main.npc[(int)NPC.realLife].ai[1] < DeathAnimation0)
+            {
+                SetViberation(false);
+            }
+            else if (Main.npc[NPC.realLife].ai[1] >= DeathAnimation1)
             {
                 NPC hd = Main.npc[NPC.realLife];
                 if (NPC.ai[3] > 0)
@@ -458,17 +462,20 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             if (NPC.life <= 0)
             {
                 BodyPreventDeath();
-                Gore.NewGore(NPC.position, NPC.velocity, base.Mod.GetGoreType("Gores/Martians/SkydestroyerbodyGore"), 1f);
-                for (int i = 0; i < 20; i++)
+                if (NPC.life <= 0)
                 {
-                    int num = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, MyDustId.CyanShortFx1, 0f, 0f, 100, default(Color), 2f);
-                    Main.dust[num].velocity *= 3f;
-                    if (Main.rand.Next(2) == 0)
+                    Gore.NewGore(NPC.position, NPC.velocity, base.Mod.GetGoreType("SkydestroyerbodyGore"), 1f);
+                    for (int i = 0; i < 20; i++)
                     {
-                        Main.dust[num].scale = 0.5f;
-                        Main.dust[num].fadeIn = 1f + (float)Main.rand.Next(10) * 0.1f;
+                        int num = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, MyDustId.CyanShortFx1, 0f, 0f, 100, default(Color), 2f);
+                        Main.dust[num].velocity *= 3f;
+                        if (Main.rand.Next(2) == 0)
+                        {
+                            Main.dust[num].scale = 0.5f;
+                            Main.dust[num].fadeIn = 1f + (float)Main.rand.Next(10) * 0.1f;
+                        }
                     }
-                }
+                }   
             }
         }
         public int spawn;

@@ -52,6 +52,10 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
         public override string Texture => MigrationUtils.ProjTexturePrefix + ProjectileID.VortexVortexPortal;
 		public virtual Vector2 Start => Projectile.Center;
 		public virtual Vector2 End => Projectile.ProjAIToVector();
+        public override void SetStaticDefaults()
+        {
+			ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 2400;
+        }
         public override void SetDefaults()
         {
             Projectile.aiStyle = -1;
@@ -281,7 +285,8 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 		}
 	}
 	public class SkyWarpMarkEx : ModProjectile
-    {		float[] scale = new float[2];
+    {		
+		float[] scale = new float[2];
 		float[] alpha = new float[2];
 		float[] rotation = new float[2];
 		
@@ -291,6 +296,10 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 		public override string Texture => MigrationUtils.ProjTexturePrefix + ProjectileID.VortexVortexPortal;
 		public Vector2 Start => Projectile.Center;
 		public Vector2 End => Projectile.velocity;
+		public override void SetStaticDefaults()
+		{
+			ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 2400;
+		}
 		public override void SetDefaults()
 		{
 			Projectile.aiStyle = -1;
@@ -480,7 +489,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
             {
 				List<VertexStripInfo> vertecies = new List<VertexStripInfo>();
 				int RayWidth = 15;
-				Color color = Color.Yellow * (1 - (float)Math.Max(alpha[0], alpha[1]) / 255);
+				Color color = Color.Yellow * Math.Max(0.2f, 1 - (float)Math.Max(alpha[0], alpha[1]) / 255);
 				var unitY = (Projectile.velocity-Projectile.Center).SafeNormalize(Vector2.UnitX).RotatedBy(MathHelper.PiOver2);
 				vertecies.Add(new VertexStripInfo(Start - unitY * RayWidth, color * 0.5f, new Vector3((float)Math.Sqrt(1), 0.3f, 1)));
 				vertecies.Add(new VertexStripInfo(Start, color, new Vector3((float)Math.Sqrt(1), 0.7f, 1)));

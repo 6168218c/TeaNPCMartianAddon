@@ -26,9 +26,9 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Sky Plasmerizer");
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 25;
-            ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
-        }
+            DisplayName.AddChineseTranslation("天际离子炮");
+            ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 2400;
+    }
         public override void SetDefaults()
         {
             Projectile.width = 48;

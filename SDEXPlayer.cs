@@ -61,9 +61,28 @@ namespace TeaNPCMartianAddon
             if (Util.CheckNPCAlive<SkyDestroyerHead>(sdExIndex))
             {
                 NPC head = Main.npc[sdExIndex];
-                if (head.ai[1] == SkyDestroyerSegment.LightningStormEx&&!Player.controlDown)
+                if (head.ai[1] == SkyDestroyerSegment.LightningStormEx)
                 {
+                    if (Player.mount.Active)
+                    {
+                        Player.mount.Dismount(Player);
+                    }
                     Player.gravity = 0f;
+                    Player.velocity += head.localAI[1].ToRotationVector2() * Player.defaultGravity / 2;
+                    if (Player.controlUp && Player.velocity.Y > 0f - Player.maxRunSpeed)
+                    {
+                        if (Player.velocity.Y > Player.runSlowdown)
+                            Player.velocity.Y -= Player.runSlowdown;
+
+                        Player.velocity.Y -= Player.runAcceleration;
+                    }
+                    else if (Player.controlDown && Player.velocity.Y < Player.maxRunSpeed)
+                    {
+                        if (Player.velocity.Y < -Player.runSlowdown)
+                            Player.velocity.Y += Player.runSlowdown;
+
+                        Player.velocity.Y += Player.runAcceleration;
+                    }
                     //player.velocity.X += Player.defaultGravity;
                 }
             }
