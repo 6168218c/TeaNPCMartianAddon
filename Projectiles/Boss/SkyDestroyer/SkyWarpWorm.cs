@@ -350,10 +350,6 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                     {
                         segments[i].alpha = 255;
                         segments[i].state = 2;
-                        if (i == segments.Count - 1)
-                        {
-                            Projectile.Kill();
-                        }
                     }
                 }
                 else

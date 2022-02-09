@@ -17,7 +17,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         }
         public override void SetDefaults()
         {
-            NPC.damage = 300;
+            NPC.damage = 150;
             NPC.width = 150;
             NPC.height = 150;
             NPC.defense = 40;

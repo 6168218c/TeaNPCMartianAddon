@@ -325,7 +325,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                 Projectile.oldSpriteDirection[num25] = Projectile.oldSpriteDirection[num25 - 1];
             }
 
-            Projectile.oldPos[0] = Projectile.position;
+            Projectile.oldPos[0] = Projectile.Center;
             Projectile.oldRot[0] = Projectile.rotation;
             Projectile.oldSpriteDirection[0] = Projectile.spriteDirection;
             float amount = 0.65f;

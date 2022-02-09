@@ -77,8 +77,8 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                         NPC.HitEffect(0, 10.0);
                         NPC.checkDead();
                     }
+                    return;
                 }
-                return;
             }
             if (NPC.target < 0 || NPC.target == 255 || Main.player[NPC.target].dead)
             {
@@ -182,10 +182,10 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             if (WarpState == 1)
             {
                 Projectile mark = Main.projectile[WarpMark];
-                if (NPC.DistanceSQ(mark.Center) <= warpDistance * warpDistance * 0.1f)
+                if (NPC.DistanceSQ(mark.ProjAIToVector()) <= warpDistance * warpDistance * 0.1f)
                 {
                     WarpState = 0;
-                    NPC.Center = mark.ProjAIToVector();
+                    NPC.Center = mark.Center;
                     //npc.alpha = 255;
                     NPC.alpha = 100;
                     NPC.hide = false;
@@ -215,7 +215,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 else
                 {
                     //npc.Center = mark.Center + npc.DirectionFrom(mark.Center) * (segDistance*npc.scale + warpDistance - prevSegment.Distance(mark.ProjAIToVector()));
-                    var target = mark.Center + NPC.DirectionFrom(mark.Center) * (SegDistance * NPC.scale + warpDistance - prevSegment.Distance(mark.ProjAIToVector()));
+                    var target = mark.ProjAIToVector() + NPC.DirectionFrom(mark.ProjAIToVector()) * (SegDistance * NPC.scale + warpDistance - prevSegment.Distance(mark.Center));
                     //npc.velocity = npc.DirectionTo(mark.Center) * head.velocity.Length();
                     /*if (npc.Distance(target) > head.velocity.Length())
                     {
@@ -227,8 +227,8 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                     }*/
                     //npc.velocity = npc.DirectionTo(mark.Center) * Math.Max(npc.Distance(target), head.velocity.Length());
                     NPC.FastMovement(target);
-                    NPC.rotation = NPC.DirectionTo(mark.Center).ToRotation();
-                    NPC.Opacity = (NPC.Distance(mark.Center) - warpDistance) / (SegDistance);
+                    NPC.rotation = NPC.DirectionTo(mark.ProjAIToVector()).ToRotation();
+                    NPC.Opacity = (NPC.Distance(mark.ProjAIToVector()) - warpDistance) / (SegDistance);
                 }
             }
         }
@@ -246,10 +246,10 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             if (WarpState == 1)
             {
                 Projectile mark = Main.projectile[WarpMark];
-                if (NPC.DistanceSQ(mark.Center) <= warpDistance * warpDistance)
+                if (NPC.DistanceSQ(mark.ProjAIToVector()) <= warpDistance * warpDistance)
                 {
                     WarpState = 0;
-                    NPC.Center = mark.ProjAIToVector();
+                    NPC.Center = mark.Center;
                     //npc.alpha = 255;
                     NPC.alpha = 100;
                     if (NPC.type == ModContent.NPCType<SkyDestroyerTail>())
@@ -276,7 +276,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 else
                 {
                     //npc.Center = mark.Center + npc.DirectionFrom(mark.Center) * (segDistance*npc.scale + warpDistance - prevSegment.Distance(mark.ProjAIToVector()));
-                    var target = mark.Center + NPC.DirectionFrom(mark.Center) * (SegDistance * NPC.scale + warpDistance - prevSegment.Distance(mark.ProjAIToVector()));
+                    var target = mark.ProjAIToVector() + NPC.DirectionFrom(mark.ProjAIToVector()) * (SegDistance * NPC.scale + warpDistance - prevSegment.Distance(mark.Center));
                     //npc.velocity = npc.DirectionTo(mark.Center) * head.velocity.Length();
                     /*if (npc.Distance(target) > head.velocity.Length())
                     {
@@ -292,9 +292,9 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                     else if (tracingStrategy == 1)
                         NPC.Center = target;
                     else if (tracingStrategy == 2)
-                        NPC.velocity = (mark.Center - NPC.Center).SafeNormalize(Vector2.Zero) * head.velocity.Length();
-                    NPC.rotation = NPC.DirectionTo(mark.Center).ToRotation();
-                    NPC.Opacity = (NPC.Distance(mark.Center)-warpDistance) / (SegDistance);
+                        NPC.velocity = (mark.ProjAIToVector() - NPC.Center).SafeNormalize(Vector2.Zero) * head.velocity.Length();
+                    NPC.rotation = NPC.DirectionTo(mark.ProjAIToVector()).ToRotation();
+                    NPC.Opacity = (NPC.Distance(mark.ProjAIToVector()) -warpDistance) / (SegDistance);
                 }
             }
         }

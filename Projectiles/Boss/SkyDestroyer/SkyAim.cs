@@ -14,6 +14,10 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 {
     public class SkyAim:ModProjectile
     {
+        public override void SetStaticDefaults()
+        {
+            ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 2400;
+        }
         public override void SetDefaults()
         {
             Projectile.aiStyle = -1;

@@ -21,7 +21,7 @@ namespace TeaNPCMartianAddon.UI
         int timer;
         public void ShowTitle(string text, Vector2? pos = null, int fade = 60, int max = 300)
         {
-            if (pos == null) pos = new Vector2(Main.screenWidth / 2, Main.screenHeight / 12);
+            if (pos == null) pos = new Vector2(Main.screenWidth / 2, Main.screenHeight / 6);
             quote = text;
             position = pos.Value;
             fadeTime = fade;

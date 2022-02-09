@@ -56,7 +56,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 					Projectile.HoverMovementEx(player.Center, 15f, 0.45f);
 				
 				Projectile.rotation = Projectile.rotation + 0.015f * MathHelper.SmoothStep(0, 1, Projectile.localAI[0] / 360) * Projectile.direction;
-				if (Projectile.localAI[0] >= 360 || (Projectile.localAI[0] >= 45 && Projectile.ai[1] == 1))
+				if (Projectile.localAI[0] >= 360 || (Projectile.localAI[0] >= 75 && Projectile.ai[1] == 1))
 				{
 					Projectile.Kill();
 				}
@@ -85,6 +85,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 			DisplayName.SetDefault("Sentry Portal");
 			ProjectileID.Sets.TrailCacheLength[Projectile.type] = 3;
 			ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
+			ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 2400;
 		}
 		public override void SetDefaults()
 		{
@@ -213,13 +214,13 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 						extraAI[0]++;
 						if (extraAI[0] % 60 == 0 && Main.netMode != NetmodeID.MultiplayerClient && para.count % 2 == 0)
 						{
-							base.Projectile.NewProjectile(Projectile.Center, Projectile.DirectionFrom(player.Center) * 8f, ModContent.ProjectileType<SkyPlasmaAcclerator>(),
-								Projectile.damage, 0f, Main.myPlayer);
+							base.Projectile.NewProjectile(Projectile.Center, Projectile.DirectionTo(player.Center) * 8f, ModContent.ProjectileType<SkyPlasmaAcclerator>(),
+								Projectile.damage, 0f, Main.myPlayer, 0, 60f);
 						}
 						else if ((extraAI[0] + 30) % 60 == 0 && Main.netMode != NetmodeID.MultiplayerClient && para.count % 2 == 1)
 						{
-							base.Projectile.NewProjectile(Projectile.Center, Projectile.DirectionFrom(player.Center) * 8f, ProjectileID.VortexLightning,
-								Projectile.damage, 0f, Main.myPlayer, Projectile.DirectionFrom(parentCenter).ToRotation());
+							base.Projectile.NewProjectile(Projectile.Center, Projectile.DirectionTo(player.Center) * 8f, ProjectileID.VortexLightning,
+								Projectile.damage, 0f, Main.myPlayer, Projectile.DirectionTo(parentCenter).ToRotation());
 						}
 					}
                 }

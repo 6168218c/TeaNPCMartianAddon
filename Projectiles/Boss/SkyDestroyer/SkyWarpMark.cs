@@ -50,8 +50,8 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 		protected bool despawning = false;
 		protected float[] extraAI = new float[2];
         public override string Texture => MigrationUtils.ProjTexturePrefix + ProjectileID.VortexVortexPortal;
-		public virtual Vector2 Start => Projectile.Center;
-		public virtual Vector2 End => Projectile.ProjAIToVector();
+		public virtual Vector2 Start => Projectile.ProjAIToVector();
+		public virtual Vector2 End => Projectile.Center;
         public override void SetStaticDefaults()
         {
 			ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 2400;
@@ -538,7 +538,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 
 			WarpMarkDrawer.BeginDraw(spriteBatch, BlendState.AlphaBlend);
 			Main.spriteBatch.Draw(texture2D13, Start - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Color.White * GetOpacity(0), -rotation[0], origin2, scale[0] * 0.8f, SpriteEffects.FlipHorizontally, 0f);
-			Main.spriteBatch.Draw(texture2D13, End - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), GetAlpha(Color.White,1), -rotation[1], origin2, scale[1] * 0.8f, SpriteEffects.FlipHorizontally, 0f);
+			Main.spriteBatch.Draw(texture2D13, End - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), Color.White * GetOpacity(1), -rotation[1], origin2, scale[1] * 0.8f, SpriteEffects.FlipHorizontally, 0f);
 			WarpMarkDrawer.EndDraw(spriteBatch);
 
 			return false;

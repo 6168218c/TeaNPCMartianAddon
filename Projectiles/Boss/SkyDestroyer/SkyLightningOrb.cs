@@ -85,6 +85,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
         {
             DisplayName.SetDefault("Lightning Orb");
             Main.projFrames[Projectile.type] = 4;
+            ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 2400;
         }
         public override void SetDefaults()
         {

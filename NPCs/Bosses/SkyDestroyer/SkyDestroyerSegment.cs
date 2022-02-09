@@ -42,7 +42,8 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         public override void ScaleExpertStats(int numPlayers, float bossLifeScale)
         {
             base.NPC.lifeMax = (int)((float)base.NPC.lifeMax * 0.8f * bossLifeScale);
-            base.NPC.damage = (int)((float)base.NPC.damage * 0.675f);
+            base.NPC.damage = (int)((float)base.NPC.damage * 0.625f);
+            if (Main.masterMode) base.NPC.damage /= 2;
         }
         public override void DrawBehind(int index)
         {
@@ -84,7 +85,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             else
             {
                 Vector2 offset = Vector2.Zero;
-                if (viberation) offset = Main.rand.NextVector2CircularEdge(20, 20);
+                if (viberation) offset = Main.rand.NextVector2CircularEdge(20, 20) * (1 - NPC.ai[3] / 600);
                 return NPC.Center - screenPos + new Vector2(0f, NPC.gfxOffY) + offset;
             }
         }
