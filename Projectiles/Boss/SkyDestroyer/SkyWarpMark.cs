@@ -287,7 +287,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 	public class SkyWarpMarkEx : ModProjectile
     {		
 		float[] scale = new float[2];
-		float[] alpha = new float[2];
+		float[] alpha = new float[2] { 0.1f, 0.1f };
 		float[] rotation = new float[2];
 		
 		protected bool firstMark;

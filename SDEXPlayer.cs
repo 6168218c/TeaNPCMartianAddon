@@ -68,13 +68,19 @@ namespace TeaNPCMartianAddon
                         Player.mount.Dismount(Player);
                     }
                     Player.gravity = 0f;
-                    Player.velocity += head.localAI[1].ToRotationVector2() * Player.defaultGravity / 2;
-                    if (Player.controlUp && Player.velocity.Y > 0f - Player.maxRunSpeed)
+                    float factor = 0.3f;
+                    if (Math.Abs(head.localAI[1]-0)<MathHelper.Pi/36
+                        || Math.Abs(head.localAI[1] - MathHelper.Pi) < MathHelper.Pi / 36)
+                    {
+                        factor *= 6;
+                    }
+                    Player.velocity += head.localAI[1].ToRotationVector2() * Player.defaultGravity * factor;
+                    if (Player.controlUp && Player.velocity.Y > 0f - Player.maxRunSpeed * 2)
                     {
                         if (Player.velocity.Y > Player.runSlowdown)
                             Player.velocity.Y -= Player.runSlowdown;
 
-                        Player.velocity.Y -= Player.runAcceleration;
+                        Player.velocity.Y -= Player.runAcceleration * 2;
                     }
                     else if (Player.controlDown && Player.velocity.Y < Player.maxRunSpeed)
                     {

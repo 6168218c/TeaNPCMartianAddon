@@ -17,7 +17,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         }
         public override void SetDefaults()
         {
-            NPC.damage = 150;
+            NPC.damage = 120;
             NPC.width = 150;
             NPC.height = 150;
             NPC.defense = 40;
@@ -71,7 +71,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             Texture2D texture2D = TextureAssets.Npc[NPC.type].Value;
             texture = TextureAssets.Npc[NPC.type].Value;
             texture2D = Mod.RequestTexture("Glow/NPCs/SkyDestroyerTailGlow");
-            Color glowColor = NPC.GetAlpha(Color.White);
+            Color glowColor = GetGlowColor();
             SpriteEffects effects = (NPC.direction < 0) ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
             var mainColor = NPC.GetAlpha(drawColor);
             spriteBatch.Draw(texture, GetDrawPosition(screenPos), new Rectangle?(NPC.frame), mainColor * NPC.Opacity, NPC.rotation + MathHelper.Pi / 2, NPC.frame.Size() / 2f, NPC.scale, effects, 0f);

@@ -23,6 +23,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         public static int AntimatterBomb => 6;
         public static int LightningStormEx => 7;
         public static int WormBarrage => 8;
+        public static int HandleWarpIssues => 18;
         public static int ResetStates => 19;
         public static int DeathAnimation0 => 20;
         public static int DeathAnimation1 => 21;
@@ -43,7 +44,11 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         {
             base.NPC.lifeMax = (int)((float)base.NPC.lifeMax * 0.8f * bossLifeScale);
             base.NPC.damage = (int)((float)base.NPC.damage * 0.625f);
-            if (Main.masterMode) base.NPC.damage /= 2;
+            if (Main.masterMode)
+            {
+                base.NPC.damage = NPC.damage * 2 / 5;
+                base.NPC.life /= 2;
+            }
         }
         public override void DrawBehind(int index)
         {
@@ -59,6 +64,23 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 return Color.Lerp(Main.ColorOfTheSkies, drawColor, 0.2f);
             }
             return null;
+        }
+        public Color GetGlowColor()
+        {
+            NPC head = null;
+            if (Util.CheckNPCAlive<SkyDestroyerHead>(NPC.realLife))
+            {
+                head=Main.npc[NPC.realLife];
+            }
+            else
+            {
+                head = NPC;
+            }
+            if(head.ai[1]>=0&&(head.ModNPC as SkyDestroyerHead)?.CurrentModule?.ID > 3)
+            {
+                return Color.Lerp(Color.Red, Color.White, 0.5f);
+            }
+            return NPC.GetAlpha(Color.White);
         }
         protected bool viberation;
         protected void SetViberation(bool value=true) => viberation = value;
