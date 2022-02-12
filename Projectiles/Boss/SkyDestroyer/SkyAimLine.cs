@@ -98,4 +98,34 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
             }
         }
     }
+    /// <summary>
+    /// Center and target is reversed to avoid drawing fluff
+    /// </summary>
+    public class SkyAimLineEx : SkyAimLine
+    {
+        public override void SetStaticDefaults()
+        {
+            ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 2400;
+        }
+        public override Color? GetAlpha(Color lightColor)
+        {
+            return Color.Red;
+        }
+        public override void AI()
+        {
+            target = Projectile.velocity;
+            Projectile.localAI[0]++;
+            if (Projectile.localAI[0] > 45)
+            {
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    Projectile.NewProjectile(target, (Projectile.Center - target).SafeNormalize(Vector2.UnitX) * Projectile.ai[1],
+                        (int)Projectile.ai[0], Projectile.damage, 0f, Main.myPlayer);
+                }
+                Projectile.Kill();
+            }
+        }
+        public override bool ShouldUpdatePosition() => false;
+        public override bool? CanDamage() => false;
+    }
 }

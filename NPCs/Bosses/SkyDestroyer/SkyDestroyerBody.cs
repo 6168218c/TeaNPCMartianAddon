@@ -21,7 +21,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         }
         public override void SetDefaults()
         {
-            NPC.damage = 100;
+            NPC.damage = baseDamage * 3 / 5;
             NPC.width = 150;
             NPC.height = 150;
             NPC.defense = 150;
@@ -73,12 +73,14 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                     if (NPC.ai[3] == 0)
                     {
                         NPC.ai[3] = -1;
+                        NPC.realLife = -1;
                         NPC.life = 0;
                         NPC.HitEffect(0, 10.0);
                         NPC.checkDead();
                     }
                     return;
                 }
+                return;
             }
             if (NPC.target < 0 || NPC.target == 255 || Main.player[NPC.target].dead)
             {

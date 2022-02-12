@@ -74,19 +74,19 @@ namespace TeaNPCMartianAddon.Items.Bosses.Martians
 				{
 					int num21 = Main.rand.Next(num13, num14);
 					int num22 = Main.rand.Next(num15, num16);
-					if (!Main.tile[num21, num22].IsActiveUnactuated || !Main.tileSolid[Main.tile[num21, num22].type])
+					if (!Main.tile[num21, num22].HasUnactuatedTile || !Main.tileSolid[Main.tile[num21, num22].TileType ])
 					{
-						if ((Main.wallHouse[Main.tile[num21, num22].wall] && l < 999))
+						if ((Main.wallHouse[Main.tile[num21, num22].WallType] && l < 999))
 						{
 							continue;
 						}
 						for (int n = num22; n < Main.maxTilesY; n++)
 						{
-							if (Main.tile[num21, n].IsActiveUnactuated && Main.tileSolid[Main.tile[num21, n].type])
+							if (Main.tile[num21, n].HasUnactuatedTile && Main.tileSolid[Main.tile[num21, n].TileType ])
 							{
 								if (num21 < num17 || num21 > num18 || n < num19 || n > num20 || l == 999)
 								{
-									_ = Main.tile[num21, n].type;
+									_ = Main.tile[num21, n].TileType;
 									num11 = num21;
 									num12 = n;
 									flag = true;
@@ -122,7 +122,7 @@ namespace TeaNPCMartianAddon.Items.Bosses.Martians
 								{
 									for (int num29 = num26; num29 < num27; num29++)
 									{
-										if (Main.tile[num28, num29].IsActiveUnactuated && Main.tileSolid[Main.tile[num28, num29].type])
+										if (Main.tile[num28, num29].HasUnactuatedTile && Main.tileSolid[Main.tile[num28, num29].TileType])
 										{
 											flag = false;
 											break;

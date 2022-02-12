@@ -209,7 +209,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                             var target = aim.Center;
                             var velo = (target - Projectile.Center).SafeNormalize(Vector2.Zero) * 15f;
                             base.Projectile.NewProjectile(Projectile.Center, velo, ProjectileID.CultistBossLightningOrbArc,
-                                Projectile.damage, 0f, Main.myPlayer, velo.ToRotation());
+                                Projectile.damage / 2, 0f, Main.myPlayer, velo.ToRotation());
                         }
                     }
                 }

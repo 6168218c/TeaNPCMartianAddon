@@ -311,6 +311,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
             }
             else
             {
+                if (Projectile.ai[1] == 0) Projectile.ai[1] = 60f;
                 if (Projectile.velocity.LengthSquared() < Projectile.ai[1] * Projectile.ai[1])
                 {
                     Projectile.velocity *= 1.05f;

@@ -28,6 +28,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
         public static int DeathAnimation0 => 20;
         public static int DeathAnimation1 => 21;
         protected int baseMaxLife = 180000;
+        protected int baseDamage = 160;
         protected float WarpState { get => NPC.localAI[2]; set { NPC.localAI[2] = value;NPC.netUpdate = true; } }
         protected int WarpMark { get => (int)NPC.localAI[3]; set { NPC.localAI[3] = value; } }
         public static int warpDistance => 78;
@@ -46,8 +47,8 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             base.NPC.damage = (int)((float)base.NPC.damage * 0.625f);
             if (Main.masterMode)
             {
-                base.NPC.damage = NPC.damage * 2 / 5;
-                base.NPC.life /= 2;
+                base.NPC.damage = NPC.damage * 5 / 11;
+                base.NPC.life /= 3;
             }
         }
         public override void DrawBehind(int index)
