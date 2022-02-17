@@ -52,10 +52,16 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
                 }
                 NPC head = Main.npc[(int)Projectile.ai[0]];
                 Player player = Main.player[head.target];
-                if (Projectile.localAI[0] < Projectile.ai[1] - 45)
+                if (Projectile.localAI[0] <= Projectile.ai[1] - 45)
                 {
                     if (head.ai[1] == SkyDestroyerSegment.Plasmerizer)
-                        Projectile.Center = player.Center + player.velocity * 60f;
+                    {
+                        Projectile.Center = Vector2.Lerp(Projectile.Center, player.Center + player.velocity * 60f, 0.75f);
+                        if (Projectile.localAI[0] == Projectile.ai[1] - 45)
+                        {
+                            Projectile.Center = player.Center + player.velocity * 60f;
+                        }
+                    }
                     else Projectile.Center = player.Center;
                 }
                 Projectile.rotation += 0.075f;

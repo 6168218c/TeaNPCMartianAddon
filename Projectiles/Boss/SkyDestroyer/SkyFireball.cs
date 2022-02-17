@@ -443,6 +443,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
         public static int RayWidth => 25;
 		public override void SetStaticDefaults()
 		{
+            ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 9000;
 			DisplayName.SetDefault("Sky Inferno");
 			DisplayName.AddTranslation(GameCulture.FromCultureName(GameCulture.CultureName.Chinese), "天际烈焰");
 		}

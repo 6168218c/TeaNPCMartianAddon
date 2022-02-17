@@ -384,6 +384,15 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
 
             return (t - from) / (to - from);
         }
+
+        public static T GetModNPC<T>(this NPC npc) where T:ModNPC
+        {
+            return npc.ModNPC as T;
+        }
+        public static T GetModProjectile<T>(this Projectile projectile) where T : ModProjectile
+        {
+            return projectile.ModProjectile as T;
+        }
     }
     public static class MigrationUtils
     {

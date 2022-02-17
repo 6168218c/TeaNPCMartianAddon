@@ -298,7 +298,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 		public Vector2 End => Projectile.velocity;
 		public override void SetStaticDefaults()
 		{
-			ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 2400;
+			ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 9000;
 		}
 		public override void SetDefaults()
 		{

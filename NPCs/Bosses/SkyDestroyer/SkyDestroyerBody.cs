@@ -77,10 +77,11 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                         NPC.life = 0;
                         NPC.HitEffect(0, 10.0);
                         NPC.checkDead();
+                        return;
                     }
+                    NPC.velocity = Vector2.Zero;
                     return;
                 }
-                return;
             }
             if (NPC.target < 0 || NPC.target == 255 || Main.player[NPC.target].dead)
             {
