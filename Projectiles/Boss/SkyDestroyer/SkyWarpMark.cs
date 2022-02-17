@@ -294,8 +294,8 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 		protected bool despawning = false;
 		protected float[] extraAI = new float[2];
 		public override string Texture => MigrationUtils.ProjTexturePrefix + ProjectileID.VortexVortexPortal;
-		public Vector2 Start => Projectile.Center;
-		public Vector2 End => Projectile.velocity;
+		public Vector2 Start => Projectile.velocity;
+		public Vector2 End => Projectile.Center;
 		public override void SetStaticDefaults()
 		{
 			ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 9000;

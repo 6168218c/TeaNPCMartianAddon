@@ -170,6 +170,13 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 if (NPC.life <= 0)
                 {
                     Gore.NewGore(NPC.position, NPC.velocity, Mod.GetGoreType("SkydestroyerbodyAltGore"), 1f);
+                    for (int num668 = 0; num668 < 10; num668++)
+                    {
+                        int num669 = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, DustID.Smoke, 0f, 0f, 100, default(Color), 1.5f);
+                        Dust dust146 = Main.dust[num669];
+                        Dust dust2 = dust146;
+                        dust2.velocity *= 1.4f;
+                    }
                     for (int i = 0; i < 20; i++)
                     {
                         int num = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, MyDustId.CyanShortFx1, 0f, 0f, 100, default(Color), 2f);

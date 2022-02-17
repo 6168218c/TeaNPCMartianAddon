@@ -48,6 +48,13 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             if (NPC.life <= 0)
             {
                 BodyPreventDeath();
+                for (int num668 = 0; num668 < 10; num668++)
+                {
+                    int num669 = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, DustID.Smoke, 0f, 0f, 100, default(Color), 1.5f);
+                    Dust dust146 = Main.dust[num669];
+                    Dust dust2 = dust146;
+                    dust2.velocity *= 1.4f;
+                }
                 for (int j = 0; j < 20; j++)
                 {
                     int num = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, MyDustId.CyanShortFx1, 0f, 0f, 100, default(Color), 2f);

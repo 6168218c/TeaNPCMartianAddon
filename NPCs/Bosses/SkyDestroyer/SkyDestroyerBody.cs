@@ -315,7 +315,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             if (WarpState == 1)
             {
                 Projectile mark = Main.projectile[WarpMark];
-                if (NPC.DistanceSQ(mark.Center) <= warpDistance * warpDistance)
+                if (NPC.DistanceSQ(mark.velocity) <= warpDistance * warpDistance)
                 {
                     WarpState = 2;
                     if (NPC.Distance(prevSegment.Center) > 6)
@@ -348,9 +348,9 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                         npc.velocity = npc.DirectionTo(mark.Center) * head.velocity.Length();
                     }*/
                     //npc.velocity = npc.DirectionTo(mark.Center) * Math.Max(npc.Distance(target), head.velocity.Length());
-                    NPC.velocity = NPC.DirectionTo(mark.Center) * (head.ModNPC as SkyDestroyerHead).GetBodyMaxSpeed();
-                    NPC.rotation = NPC.DirectionTo(mark.Center).ToRotation();
-                    NPC.Opacity = (NPC.Distance(mark.Center) - warpDistance) / (SegDistance);
+                    NPC.velocity = NPC.DirectionTo(mark.velocity) * (head.ModNPC as SkyDestroyerHead).GetBodyMaxSpeed();
+                    NPC.rotation = NPC.DirectionTo(mark.velocity).ToRotation();
+                    NPC.Opacity = (NPC.Distance(mark.velocity) - warpDistance) / (SegDistance);
                 }
             }
             else if (WarpState == 2)//awaiting
@@ -360,10 +360,10 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 NPC.velocity = Vector2.Zero;
                 if (prevSegment.localAI[2] != 2)
                 {
-                    Vector2 end = mark.velocity;
+                    Vector2 end = mark.Center;
                     if ((GetLinkPoint(prevSegment) - end).LengthSquared() >= SegDistance * SegDistance)
                     {
-                        NPC.Center = mark.velocity;
+                        NPC.Center = mark.Center;
                         WarpState = 0;
                         //npc.alpha = 255;
                         NPC.alpha = 100;
@@ -391,7 +391,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 }
                 else
                 {
-                    NPC.Center = mark.Center;
+                    NPC.Center = mark.velocity;
                     NPC.alpha = 255;
                 }
             }
@@ -469,6 +469,13 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 if (NPC.life <= 0)
                 {
                     Gore.NewGore(NPC.position, NPC.velocity, base.Mod.GetGoreType("SkydestroyerbodyGore"), 1f);
+                    for (int num668 = 0; num668 < 10; num668++)
+                    {
+                        int num669 = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, DustID.Smoke, 0f, 0f, 100, default(Color), 1.5f);
+                        Dust dust146 = Main.dust[num669];
+                        Dust dust2 = dust146;
+                        dust2.velocity *= 1.4f;
+                    }
                     for (int i = 0; i < 20; i++)
                     {
                         int num = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, MyDustId.CyanShortFx1, 0f, 0f, 100, default(Color), 2f);

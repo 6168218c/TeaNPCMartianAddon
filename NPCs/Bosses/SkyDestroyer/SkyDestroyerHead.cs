@@ -21,7 +21,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
     {
         #region Fields
         private bool spawned;
-        private bool Dead = false;
+        private bool playerDead = false;
         private bool lastPhase = false;
         Vector2 centerVector;
         public float DynDR;
@@ -88,12 +88,13 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 }
             }
         }
-        public ModulePhase[] Modules { get; private set; } = new ModulePhase[4]
+        public ModulePhase[] Modules { get; private set; } = new ModulePhase[]
         {
             new ModulePhase(1,LightningStorm,Plasmerizer,1,"Mods.TeaNPCMartianAddon.NPCChat.SDEX1"),
             new ModulePhase(2,new int[]{ WarpMove,Plasmerizer,PlasmaWarpBlast,FireballBarrage,LightningStorm },0.85f,"Mods.TeaNPCMartianAddon.NPCChat.SDEX2"),
-            new ModulePhase(3,new int[]{ SpaceWarp,WormBarrage, WarpMove, Plasmerizer, PlasmaWarpBlast,WormBarrage,FireballBarrage,WarpMove },0.45f,"Mods.TeaNPCMartianAddon.NPCChat.SDEX3"),
-            new ModulePhase(4,new int[]{ LightningStormEx,Plasmerizer,SpaceWarp, AntimatterBomb, PlasmaWarpBlast },0,"Mods.TeaNPCMartianAddon.NPCChat.SDEX4")
+            new ModulePhase(3,new int[]{ SpaceWarp,WormBarrage, Plasmerizer, PlasmaWarpBlast, WarpMove, FireballBarrage,WormBarrage,PlasmaWarpBlast,WarpMove },0.45f,"Mods.TeaNPCMartianAddon.NPCChat.SDEX3"),
+            new ModulePhase(4,new int[]{ LightningStormEx,Plasmerizer,SpaceWarp, AntimatterBomb, PlasmaWarpBlast },0,"Mods.TeaNPCMartianAddon.NPCChat.SDEX4"),
+            new ModulePhase(5,new int[]{ ResetStates,DeathAnimation1 },0,"Mods.TeaNPCMartianAddon.NPCChat.SDEX5")
         };
         private int _currModuleIndex = -1;
         internal ModulePhase CurrentModule => Modules[_currModuleIndex];
@@ -196,10 +197,10 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             Player player = Main.player[base.NPC.target];
             bool expertMode = Main.expertMode;
             Lighting.AddLight((int)((base.NPC.position.X + (float)(base.NPC.width / 2)) / 16f), (int)((base.NPC.position.Y + (float)(base.NPC.height / 2)) / 16f), 0.2f, 0.05f, 0.2f);
-            if (player.dead && !Dead)
+            if (player.dead && !playerDead)
             {
                 SDMessage(Language.GetTextValue("Mods.TeaNPCMartianAddon.NPCChat.SD1"));
-                Dead = true;
+                playerDead = true;
             }
             #region Loomup
             if (base.NPC.alpha != 0)
@@ -590,7 +591,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 Util.KillAll<SkyLightningOrbCenter>();
                 Util.KillAll<SkyUFO>(true, 1);
                 Util.KillAll<SkyPlasmaBallChainHead>(true);
-                WarpMark = NPC.NewProjectile(NPC.Center + NPC.velocity * 20, player.Center + Main.rand.NextVector2Unit() * 200, ModContent.ProjectileType<SkyWarpMarkEx>(),
+                WarpMark = NPC.NewProjectile(player.Center + Main.rand.NextVector2Unit() * 200, NPC.Center + NPC.velocity * 20,  ModContent.ProjectileType<SkyWarpMarkEx>(),
                         0, 0f, Main.myPlayer, 10, 0);
                 WarpState = 1;
                 NPC.netUpdate = true;
@@ -600,13 +601,13 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 if (Util.CheckProjAlive<SkyWarpMarkEx>(WarpMark))
                 {
                     Projectile mark = Main.projectile[WarpMark];
-                    if (NPC.DistanceSQ(mark.Center) <= warpDistance * warpDistance)
+                    if (NPC.DistanceSQ(mark.velocity) <= warpDistance * warpDistance)
                     {
                         WarpState = 2;
                     }
                     else
                     {
-                        NPC.velocity = (mark.Center - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
+                        NPC.velocity = (mark.velocity - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
                     }
                 }
                 else
@@ -631,7 +632,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                                 Main.projectile[i].Kill();
                             }
                         }
-                        NPC.Center = mark.velocity;
+                        NPC.Center = mark.Center;
                         WarpState = 0;
                         mark.localAI[1]++;
                         NPC.velocity = (player.Center - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
@@ -1101,7 +1102,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             {
                 if (NPC.ai[3] < times && NPC.ai[2] % 360 == 0 && Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    NPC.localAI[0] = NPC.NewProjectile(NPC.Center + NPC.velocity * 20, player.Center + Main.rand.NextVector2Unit() * 1200, ModContent.ProjectileType<SkyWarpMarkEx>(),
+                    NPC.localAI[0] = NPC.NewProjectile(player.Center + Main.rand.NextVector2Unit() * 1200, NPC.Center + NPC.velocity * 20,  ModContent.ProjectileType<SkyWarpMarkEx>(),
                         0, 0f, Main.myPlayer, 0, 1);
                 }
                 NPC.ai[2]++;
@@ -1114,7 +1115,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                         mark.ai[0] = 01;
                         mark.netUpdate = true;
                         (mark.ModProjectile as SkyWarpMarkEx).ResetExtraAI(1);
-                        mark.velocity = player.Center + Main.rand.NextVector2Unit() * length;
+                        mark.Center = player.Center + Main.rand.NextVector2Unit() * length;
                     }
                 }
                 if (NPC.ai[2] % 360 <= 180  && NPC.ai[3] < times)
@@ -1122,11 +1123,10 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                     if (Util.CheckProjAlive<SkyWarpMarkEx>((int)NPC.localAI[0])&&NPC.localAI[0]!=WarpMark)
                     {
                         Projectile mark = Main.projectile[(int)NPC.localAI[0]];
-                        mark.Center = NPC.Center + NPC.velocity * 20;
+                        mark.velocity = NPC.Center + NPC.velocity * 20;
                         mark.ai[0] = 11;
                         mark.netUpdate = true;
                         (mark.ModProjectile as SkyWarpMarkEx).ResetExtraAI(0);
-                        if (NPC.ai[2] % 360 == 180) mark.ai[0] = 11;
                     }
                     if (NPC.ai[2] % 360 == 180)
                     {
@@ -1137,11 +1137,8 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 }
                 if (NPC.ai[3] >= times)
                 {
-                    if (NPC.ai[2] % 360 == 320)
-                    {
-                        CurrentModule.SwitchToNext(this);
-                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * maxSpeed;
-                    }
+                    CurrentModule.SwitchToNext(this);
+                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * maxSpeed;
                 }
                 NPC.WormMovementEx(player.Center, maxSpeed * 1.8f, turnAcc, ramAcc, angleLimit: MathHelper.PiOver2, distLimit: 1800,
                     radiusSpeed: 0.15f);
@@ -1159,13 +1156,13 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 if (Util.CheckProjAlive<SkyWarpMarkEx>(WarpMark))
                 {
                     Projectile mark = Main.projectile[WarpMark];
-                    if (NPC.DistanceSQ(mark.Center) <= warpDistance * warpDistance)
+                    if (NPC.DistanceSQ(mark.velocity) <= warpDistance * warpDistance)
                     {
                         WarpState = 2;
                     }
                     else
                     {
-                        NPC.velocity = (mark.Center - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
+                        NPC.velocity = (mark.velocity - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
                     }
                 }
                 else
@@ -1197,11 +1194,11 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                                 , ModContent.ProjectileType<SkyPortalSentry>(),
                                 NPC.damage / 4, 0f, Main.myPlayer, SkyPortalSentry.PackAi0((0, 3)), 9);
                         }
-                        NPC.Center = mark.velocity;
+                        NPC.Center = mark.Center;
                         WarpState = 0;
                         mark.localAI[1]++;
                         NPC.ai[3]++;
-                        NPC.velocity = (player.Center - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
+                        NPC.velocity = (player.Center + player.velocity * 20 - NPC.Center).SafeNormalize(Vector2.UnitX) * maxSpeed;
                     }
                 }
             }
@@ -1341,7 +1338,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 NPC.netUpdate = true;
                 NPC.ai[2]++;
 
-                WarpMark = NPC.NewProjectile(NPC.Center + NPC.velocity * 20, player.Center + Main.rand.NextVector2Unit() * 1200, ModContent.ProjectileType<SkyWarpMarkEx>(),
+                WarpMark = NPC.NewProjectile(player.Center + Main.rand.NextVector2Unit() * 1200, NPC.Center + NPC.velocity * 20,  ModContent.ProjectileType<SkyWarpMarkEx>(),
                             0, 0f, Main.myPlayer, 11, 0);
                 WarpState = 1;
                 NPC.netUpdate = true; 
@@ -1357,13 +1354,13 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                     if (Util.CheckProjAlive<SkyWarpMarkEx>(WarpMark))
                     {
                         Projectile mark = Main.projectile[WarpMark];
-                        if (NPC.DistanceSQ(mark.Center) <= warpDistance * warpDistance)
+                        if (NPC.DistanceSQ(mark.velocity) <= warpDistance * warpDistance)
                         {
                             WarpState = 2;
                         }
                         else
                         {
-                            NPC.velocity = (mark.Center - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
+                            NPC.velocity = (mark.velocity - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
                         }
                     }
                     else
@@ -1389,10 +1386,10 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                     if (Util.CheckProjAlive<SkyWarpMarkEx>(WarpMark))
                     {
                         Projectile mark = Main.projectile[WarpMark];
-                        mark.velocity = pos;
+                        mark.Center = pos;
                         if (NPC.ai[2] == 120)
                         {
-                            NPC.Center = mark.velocity;
+                            NPC.Center = mark.Center;
                             WarpState = 0;
                             mark.localAI[1]++;
                             NPC.ai[3]++;
@@ -1585,7 +1582,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             {
                 if (NPC.ai[2] % 360 == 0 && Main.netMode != NetmodeID.MultiplayerClient && NPC.ai[3] < times)
                 {
-                    NPC.localAI[0] = NPC.NewProjectile(NPC.Center + NPC.velocity * 20, player.Center + Main.rand.NextVector2Unit() * 1200, ModContent.ProjectileType<SkyWarpMarkEx>(),
+                    NPC.localAI[0] = NPC.NewProjectile(player.Center + Main.rand.NextVector2Unit() * 1200, NPC.Center + NPC.velocity * 20,  ModContent.ProjectileType<SkyWarpMarkEx>(),
                         0, 0f, Main.myPlayer, 0, 1);
                 }
                 if (NPC.ai[2] % 360 == 0 && !Main.dedServ)
@@ -1604,7 +1601,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                         mark.ai[0] = 01;
                         mark.netUpdate = true;
                         (mark.ModProjectile as SkyWarpMarkEx).ResetExtraAI(1);
-                        mark.velocity = player.Center + Main.rand.NextVector2Unit() * length;
+                        mark.Center = player.Center + Main.rand.NextVector2Unit() * length;
                     }
                 }
                 if (NPC.ai[2] % 360 <= 180 && NPC.ai[3] < times)
@@ -1612,7 +1609,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                     if (Util.CheckProjAlive<SkyWarpMarkEx>((int)NPC.localAI[0]) && NPC.localAI[0] != WarpMark)
                     {
                         Projectile mark = Main.projectile[(int)NPC.localAI[0]];
-                        mark.Center = NPC.Center + NPC.velocity * 20;
+                        mark.velocity = NPC.Center + NPC.velocity * 20;
                         mark.ai[0] = 11;
                         mark.netUpdate = true;
                         (mark.ModProjectile as SkyWarpMarkEx).ResetExtraAI(0);
@@ -1645,13 +1642,13 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 if (Util.CheckProjAlive<SkyWarpMarkEx>(WarpMark))
                 {
                     Projectile mark = Main.projectile[WarpMark];
-                    if (NPC.DistanceSQ(mark.Center) <= warpDistance * warpDistance)
+                    if (NPC.DistanceSQ(mark.velocity) <= warpDistance * warpDistance)
                     {
                         WarpState = 2;
                     }
                     else
                     {
-                        NPC.velocity = (mark.Center - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
+                        NPC.velocity = (mark.velocity - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
                     }
                 }
                 else
@@ -1673,7 +1670,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                     Projectile mark = Main.projectile[WarpMark];
                     if (NPC.ai[2] % 360 >= 240)
                     {
-                        NPC.Center = mark.velocity;
+                        NPC.Center = mark.Center;
                         WarpState = 0;
                         mark.localAI[1]++;
                         NPC.ai[3]++;
@@ -1689,7 +1686,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             {
                 if (NPC.ai[3] < times && NPC.ai[2] % 360 == 0 && Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    NPC.localAI[0] = NPC.NewProjectile(NPC.Center + NPC.velocity * 20, player.Center + Main.rand.NextVector2Unit() * 1200, ModContent.ProjectileType<SkyWarpMarkEx>(),
+                    NPC.localAI[0] = NPC.NewProjectile(player.Center + Main.rand.NextVector2Unit() * 1200, NPC.Center + NPC.velocity * 20, ModContent.ProjectileType<SkyWarpMarkEx>(),
                         0, 0f, Main.myPlayer, 0);
                 }
                 NPC.ai[2]++;
@@ -1701,7 +1698,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                         mark.ai[0] = 10;
                         mark.netUpdate = true;
                         (mark.ModProjectile as SkyWarpMarkEx).ResetExtraAI(0);
-                        mark.Center = NPC.Center + NPC.velocity * 20;
+                        mark.velocity = NPC.Center + NPC.velocity * 20;
                     }
                     WarpMark=(int)NPC.localAI[0];
                     WarpState = 1;
@@ -1723,13 +1720,13 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 if (Util.CheckProjAlive<SkyWarpMarkEx>(WarpMark))
                 {
                     Projectile mark = Main.projectile[WarpMark];
-                    if (NPC.DistanceSQ(mark.Center) <= warpDistance * warpDistance)
+                    if (NPC.DistanceSQ(mark.velocity) <= warpDistance * warpDistance)
                     {
                         WarpState = 2;
                     }
                     else
                     {
-                        NPC.velocity = (mark.Center - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
+                        NPC.velocity = (mark.velocity - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
                     }
                 }
                 else
@@ -1754,7 +1751,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                         {
                             var offset = Main.rand.NextVector2CircularEdge(600, 400);
                             NPC.NewProjectile(player.Center + offset, offset.SafeNormalize(Vector2.Zero),
-                                ModContent.ProjectileType<SkyWarpWorm>(), NPC.damage / 2, 0f, Main.myPlayer, 360, 2);
+                                ModContent.ProjectileType<SkyWarpWorm>(), NPC.damage / 2, 0f, Main.myPlayer, 180, 2);
                         }
                         if (NPC.ai[2] % 360 == 200)
                         {
@@ -1763,11 +1760,20 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                                 NPC.NewProjectile(player.Center + player.velocity * 60, Vector2.Zero, ModContent.ProjectileType<SkyAim>(), 0,
                                     0f, Main.myPlayer, -1, 40);
                             }
-                            mark.velocity = player.Center + player.velocity * 60;
+                            mark.Center = player.Center + player.velocity * 60;
                         }
 
                         if (NPC.ai[2] % 360 == 240)
                         {
+                            if (Main.netMode != NetmodeID.MultiplayerClient)
+                            {
+                                Projectile proj = NPC.NewProjectileDirect(mark.Center,
+                                    Vector2.Zero
+                                    , ModContent.ProjectileType<SkyAimLine>(),
+                                    0, 0f, Main.myPlayer, NPC.whoAmI, 1);
+                                proj.localAI[0] = 20;
+                                proj.netUpdate = true;
+                            }
                             mark.ai[0] = 11;
                             mark.netUpdate = true;
                             mark.GetModProjectile<SkyWarpMarkEx>().ResetExtraAI(1);
@@ -1775,22 +1781,11 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                     }
                     else
                     {
-                        if (Main.netMode != NetmodeID.MultiplayerClient)
-                        {
-                            NPC.NewProjectile(mark.Center,
-                                Vector2.Zero
-                                , ModContent.ProjectileType<SkyPortalSentry>(),
-                                NPC.damage / 4, 0f, Main.myPlayer, SkyPortalSentry.PackAi0((0, 3)), 9);
-                            NPC.NewProjectile(mark.velocity,
-                                Vector2.Zero
-                                , ModContent.ProjectileType<SkyPortalSentry>(),
-                                NPC.damage / 4, 0f, Main.myPlayer, SkyPortalSentry.PackAi0((0, 3)), 9);
-                        }
-                        NPC.Center = mark.velocity;
+                        NPC.Center = mark.Center;
                         WarpState = 0;
                         mark.localAI[1]++;
                         NPC.ai[3]++;
-                        NPC.velocity = (player.Center - NPC.Center).SafeNormalize(Vector2.UnitX) * maxSpeed;
+                        NPC.velocity = (player.Center + player.velocity * 20 - NPC.Center).SafeNormalize(Vector2.UnitX) * maxSpeed;
                     }
                 }
             }
@@ -1806,7 +1801,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 Util.KillAll<SkyLightningOrbCenter>();
                 Util.KillAll<SkyUFO>(true, 1);
                 Util.KillAll<SkyPlasmaBallChainHead>(true);
-                WarpMark = NPC.NewProjectile(NPC.Center + NPC.velocity * 20, player.Center + Main.rand.NextVector2Unit() * 200, ModContent.ProjectileType<SkyWarpMarkEx>(),
+                WarpMark = NPC.NewProjectile(player.Center + Main.rand.NextVector2Unit() * 200, NPC.Center + NPC.velocity * 20,  ModContent.ProjectileType<SkyWarpMarkEx>(),
                         0, 0f, Main.myPlayer, 10, 0);
                 WarpState = 1;
                 NPC.netUpdate = true;
@@ -1816,13 +1811,13 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 if (Util.CheckProjAlive<SkyWarpMarkEx>(WarpMark))
                 {
                     Projectile mark = Main.projectile[WarpMark];
-                    if (NPC.DistanceSQ(mark.Center) <= warpDistance * warpDistance)
+                    if (NPC.DistanceSQ(mark.velocity) <= warpDistance * warpDistance)
                     {
                         WarpState = 2;
                     }
                     else
                     {
-                        NPC.velocity = (mark.Center - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
+                        NPC.velocity = (mark.velocity - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
                     }
                 }
                 else
@@ -1915,7 +1910,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                                 tmpNPC.dontTakeDamage = false;
                                 i = (int)Main.npc[i].ai[0];
                             }
-                            NPC.Center = mark.velocity;
+                            NPC.Center = mark.Center;
                             WarpState = 0;
                             mark.localAI[1]++;
                             NPC.velocity = (player.Center - NPC.Center).SafeNormalize(Vector2.Zero) * maxSpeed;
@@ -2042,6 +2037,13 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             }
             if (base.NPC.life <= 0)
             {
+                for (int num668 = 0; num668 < 10; num668++)
+                {
+                    int num669 = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, DustID.Smoke, 0f, 0f, 100, default(Color), 1.5f);
+                    Dust dust146 = Main.dust[num669];
+                    Dust dust2 = dust146;
+                    dust2.velocity *= 1.4f;
+                }
                 for (int j = 0; j < 20; j++)
                 {
                     int num = Dust.NewDust(new Vector2(base.NPC.position.X, base.NPC.position.Y), base.NPC.width, base.NPC.height, MyDustId.CyanShortFx1, 0f, 0f, 100, default(Color), 2f);
@@ -2065,6 +2067,7 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
                 NPC.life = 1;
                 SwitchTo(DeathAnimation0);
                 _currModuleIndex = 3;
+                SDMessage(CurrentModule.EnterQuoteID);
                 int i = NPC.whoAmI;
                 int counter = 0;
                 while (i != -1)
@@ -2078,8 +2081,9 @@ namespace TeaNPCMartianAddon.NPCs.Bosses.SkyDestroyer
             }
             else if (NPC.ai[1] < DeathAnimation1)
             {
+                _currModuleIndex = 4;
+                SDMessage(CurrentModule.EnterQuoteID);
                 NPC.life = 1;
-                SwitchTo(DeathAnimation1);
                 int i = NPC.whoAmI;
                 int counter = 0;
                 while (i != -1)

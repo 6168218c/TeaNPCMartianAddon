@@ -73,11 +73,12 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
 
         public override void SetDefaults()
         {
-            Projectile.width = Projectile.height = 15;
+            Projectile.width = Projectile.height = 600;
             Projectile.aiStyle = -1;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
             Projectile.alpha = 255;
+            Projectile.hostile = true;
 
             Projectile.extraUpdates = 0;
             CooldownSlot = 1;

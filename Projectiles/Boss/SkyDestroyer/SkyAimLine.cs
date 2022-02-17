@@ -48,7 +48,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
             {
                 NPC head = Main.npc[(int)Projectile.ai[0]];
                 Player player = Main.player[head.target];
-                target = Projectile.Center + (player.Center - Projectile.Center).SafeNormalize(Vector2.Zero) * 3600;
+                target = Projectile.Center + (player.Center + player.velocity * Projectile.localAI[0] - Projectile.Center).SafeNormalize(Vector2.Zero) * 3600;
             }
             else if (Projectile.ai[1] == 2)
             {
@@ -66,7 +66,7 @@ namespace TeaNPCMartianAddon.Projectiles.Boss.SkyDestroyer
         }
         public override Color? GetAlpha(Color lightColor)
         {
-            if (Projectile.ai[1] == 0 || Projectile.ai[1] == 2)
+            if (Projectile.ai[1] == 0||Projectile.ai[1]==1 || Projectile.ai[1] == 2)
             {
                 return Color.Turquoise;
             }
