@@ -1,1 +1,9 @@
-This Martian Addon is a small mod adding EX varient of Sky Destroyer.
+An simple addon for TeaNPC, adding a reworked varient of the endgame boss, The Sky Colossus.
+Currently as TeaNPC hasn't published stable build, the boss adapt to vanilla Terraria and has no loots.
+
+TODO:
+	-[]Add boss loot corresponding to original TeaNPC.
+	-[]Add judgement cut.
+	-[]Adapt damage and health values to TeaNPC
+
+Please report any bugs at https://github.com/6168218c/TeaNPCMartianAddon 

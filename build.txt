@@ -1,3 +1,4 @@
 displayName = TeaNPC - Martian Addon
 author = TeaNPC Team, 6168218c
 version = 0.0.1.0
+homepage = https://space.bilibili.com/313180490
