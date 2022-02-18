@@ -1,5 +1,5 @@
-An simple addon for TeaNPC, adding a reworked varient of the endgame boss, The Sky Colossus.
-Currently as TeaNPC hasn't published stable build, the boss adapt to vanilla Terraria and has no loots.
+A simple addon for TeaNPC, adding a reworked varient of the endgame boss, The Sky Colossus.
+Currently as TeaNPC hasn't published stable build, the boss adapts to vanilla Terraria and has no loots.
 
 TODO:
 	-[]Add boss loot corresponding to original TeaNPC.
